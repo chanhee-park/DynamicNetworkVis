@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Dynamic Network Visualization</title>
+  <link rel="stylesheet"
+        href="stylesheets/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+</head>
+
+<body>
+  <div class="app">
+    <div class="section-group top">
+
+      <!--Time Slider-->
+      <section id="time-zone">
+        <div class="sectino-title">Time Slider</div>
+      </section>
+
+    </div>
+
+    <div class="section-group body">
+
+      <!--Parallel Coordinate-->
+      <section id="parallel-zone">
+        <div class="sectino-title">Parallel Coordinate</div>
+      </section>
+
+      <!--Scatter Plot-->
+      <section id="scatter-zone">
+        <div class="sectino-title">Scatter Plot</div>
+      </section>
+
+    </div>
+
+    <div class="section-group bottom">
+
+      <!--Small Multiples-->
+      <section id="smalls-zone">
+        <div class="sectino-title">Small Multiples</div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="scripts/data.js"></script>
+  <script src="scripts/util.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+
+</html>
