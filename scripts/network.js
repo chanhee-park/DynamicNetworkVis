@@ -97,8 +97,7 @@ class Network {
   static compare (a, b) {
     const nodes = Network.compareNodes(a.nodes, b.nodes);
     const links = Network.compareLinks(a.links, b.links);
-    console.log('nodes:', nodes);
-    console.log('links:', links);
+    return { nodes, links };
   }
 
   static compareNodes (nodes, otherNodes) {

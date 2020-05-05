@@ -67,3 +67,9 @@ section#smalls-zone {
 section#table-zone {
   flex: 4;
 }
+
+/* svgs */
+svg {
+  width: 100%;
+  height: 100%;
+}
