@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  border: 1px solid #ccc;
 }
 
 body {
@@ -12,7 +13,7 @@ body {
 .app {
   width: 100%;
   height: 100%;
-  padding: 5px;
+  padding: 3px;
   background: #fff;
   border: 1px solid #555;
   display: flex;
@@ -22,11 +23,11 @@ body {
 /* section-group */
 .section-group {
   width: 100%;
-  padding: 5px;
+  padding: 3px;
 }
 
 .section-group.top {
-  flex: 2;
+  flex: 1.25;
 }
 
 .section-group.body {
@@ -36,7 +37,9 @@ body {
 }
 
 .section-group.bottom {
-  flex: 4;
+  flex: 4.75;
+  display: flex;
+  flex-direction: column;
 }
 
 /* section */
@@ -47,10 +50,20 @@ section {
   height: 100%;
 }
 
+/* section => section-group.body */
 section#parallel-zone {
   flex: 7.5;
 }
 
 section#scatter-zone {
   flex: 2.5;
+}
+
+/* section => section-group.bottom */
+section#smalls-zone {
+  flex: 6;
+}
+
+section#table-zone {
+  flex: 4;
 }

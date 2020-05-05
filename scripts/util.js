@@ -1,4 +1,11 @@
+// 시각화 외적인 기능을 계산하고 처리하는 유틸리티
 const Util = {
+  /**
+   * 파일을 불러온다.
+   * @method loadFile
+   * @param {string} filePath 불러올 파일의 파일명을 포함한 경로
+   * @returns {string} 불러온 파일의 responseText
+   */
   loadFile: (filePath) => {
     let result = null;
     let xmlhttp = new XMLHttpRequest();
@@ -9,36 +16,53 @@ const Util = {
     }
     return result;
   },
+
+  min: (arrayLike) => {
+    let min = +Infinity;
+    for (let item of arrayLike) {
+      min = Math.min(min, item)
+    }
+    return isFinite(min) ? min : -1
+  },
+
+  max: (arrayLike) => {
+    let max = -Infinity;
+    for (let item of arrayLike) {
+      max = Math.max(max, item)
+    }
+    return isFinite(max) ? max : -1
+  }
+
 }
 
+/**
+ * 테스트 데이터를 불러온다.
+ * from './dataset/copresence-InVS13/copresence-InVS13.edges'
+ */
 function getTestData () {
-  const res = Util.loadFile(Data.dataset);
+  const res = Util.loadFile(Data.testset);
   const lines = res.split('\n');
 
-  const network = {
-    nodes: [],
-    edges: [],
-    times: [],
-  }
+  let nodes = new Set();;
+  let links = new Set();;
+  let times = new Set();;
 
   _.forEach(lines, line => {
     let elems = line.split(' ');
     if (elems[0].length > 0
       && elems[1].length > 0
       && elems[2].length > 0
-      && Math.random() > 0.99) {
+      && Math.random() > 0.9) {
+
       const from = parseInt(elems[0]);
       const to = parseInt(elems[1]);
-      const time = parseInt(parseInt(elems[2]) / 10000);
-      network.nodes.push(from);
-      network.nodes.push(to);
-      network.times.push(time);
-      network.edges.push({ from, to, time });
+      const time = parseInt(elems[2]);
+
+      nodes.add(from).add(to);
+      times.add(time);
+      links.add(new Link(from, to, time));
     }
   });
 
-  network.nodes = _.uniq(network.nodes).sort((a, b) => { return a - b });
-  network.times = _.uniq(network.times).sort((a, b) => { return a - b });
-  network.edges = _.sortBy(network.edges, ['time', 'from', 'to']);
-  return network;
+  return new Network(nodes, links, times);
 }

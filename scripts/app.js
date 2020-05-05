@@ -1,5 +1,5 @@
-const network = getTestData();
-console.log(network);
+const mynetwork = getTestData();
+mynetwork.print();
 
 // TODO: Time Slider 그리기
 
@@ -7,7 +7,9 @@ console.log(network);
 
 // TODO: scatter plot 그리기
 
-// TODO: Small Multiples
+// TODO: Small Multiples 그리기
+
+// TODO: Node Stats Table 그리기
 
 // TODO: Interaction - 시간 합치고 분리하기
 
