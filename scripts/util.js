@@ -31,6 +31,26 @@ const Util = {
       max = Math.max(max, item)
     }
     return isFinite(max) ? max : -1
+  },
+
+  compareSets: (pre, post) => {
+    const union = new Set([...pre, ...post]);
+
+    const common = new Set();
+    const preOnly = new Set();
+    const postOnly = new Set();
+
+    for (let e of union) {
+      if (pre.has(e) && post.has(e)) {
+        common.add(e)
+      } else if (pre.has(e)) {
+        preOnly.add(e)
+      } else if (post.has(e)) {
+        postOnly.add(e)
+      }
+    }
+
+    return { preOnly, postOnly, common }
   }
 
 }
@@ -52,7 +72,7 @@ function getTestData () {
     if (elems[0].length > 0
       && elems[1].length > 0
       && elems[2].length > 0
-      && Math.random() > 0.9) {
+      && Math.random() > 0) {
 
       const from = parseInt(elems[0]);
       const to = parseInt(elems[1]);

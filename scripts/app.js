@@ -1,6 +1,9 @@
 const mynetwork = getTestData();
 mynetwork.print();
 
+// subtract
+Network.compare(mynetwork.subNetworks[0], mynetwork.subNetworks[1]);
+
 // TODO: Time Slider 그리기
 
 // TODO: P-coord 그리기

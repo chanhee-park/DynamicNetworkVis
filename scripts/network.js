@@ -79,7 +79,12 @@ class Network {
         spNodes[idx],
         spLinks[idx],
         spTimes[idx],
-        Network.typeSub(idx, numberOfSplits, network.timeFirst, network.timeLast)
+        Network.typeSub(
+          idx,
+          numberOfSplits,
+          network.timeFirst,
+          network.timeLast
+        )
       );
     }
 
@@ -88,8 +93,29 @@ class Network {
     return network.subNetworks;
   }
 
-  // TODO: this.diff(otherNetwork)
+  // TODO: difference, union, intersaction
+  static compare (a, b) {
+    const nodes = Network.compareNodes(a.nodes, b.nodes);
+    const links = Network.compareLinks(a.links, b.links);
+    console.log('nodes:', nodes);
+    console.log('links:', links);
+  }
 
+  static compareNodes (nodes, otherNodes) {
+    return Util.compareSets(nodes, otherNodes)
+  }
+
+  static compareLinks (links, otherLinks) {
+    const linksNoTime = new Set();
+    const otherLinksNoTime = new Set();
+    for (let e of links) {
+      linksNoTime.add(Link.withoutTime(e));
+    }
+    for (let e of otherLinks) {
+      otherLinksNoTime.add(Link.withoutTime(e));
+    }
+    return Util.compareSets(linksNoTime, otherLinksNoTime);
+  }
 }
 
 /**
@@ -99,7 +125,7 @@ class Network {
  * @param {number} time
  */
 class Link {
-  constructor(fromId, toId, time) {
+  constructor(fromId, toId, time = 0) {
     this.from = fromId;
     this.to = toId;
     this.time = time;
@@ -107,6 +133,10 @@ class Link {
 
   print () {
     console.log(this.from, this.to, this.time);
+  }
+
+  static withoutTime (link) {
+    return new Link(link.from, link.to);
   }
 }
 
