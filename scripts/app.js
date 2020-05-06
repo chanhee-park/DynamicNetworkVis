@@ -137,6 +137,7 @@ function drawTimeSlider (svg, bars, max) {
       Links: +${bar['adLinks']}  /  -${bar['rmLinks']}
     `
     console.log(bar);
+
     _.forEach(values, (value, j) => {
       const isAdded = j % 2 == 0;  // [added, removed, added, removed]
       const isNode = j < 1;        // [node, node, link, link]
@@ -146,6 +147,7 @@ function drawTimeSlider (svg, bars, max) {
       const barX = isNode ? x : x + barW;
       const fill = isNode ? COLOR_BAR_NODE : COLOR_BAR_LINK;
 
+      // TODO: SET 방식으로 그리기
       svg.append('rect').attrs({
         x: barX,
         y: barY,
