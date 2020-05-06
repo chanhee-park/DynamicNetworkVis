@@ -2,20 +2,19 @@
 class Network {
   constructor(nodes, links, times, typeInfo) {
     this.typeInfo = typeof typeInfo !== 'undefined' ? typeInfo : Network.typeTotal();
-
     this.nodes = typeof nodes !== 'undefined' ? nodes : new Set();
     this.links = typeof links !== 'undefined' ? links : new Set();
-
     this.times = typeof times !== 'undefined' ? times : this.setTimes();
     this.timeFirst = Util.min(this.times);
     this.timeLast = Util.max(this.times);
 
     this.subNetworks = undefined;
     if (this.typeInfo.type == Network.typeTotal().type) {
-      this.subNetworks = Network.splitByTime(this)
+      this.subNetworks = Network.splitByTime(this);
     } else {
       this.timeFirst = this.typeInfo.start;
       this.timeLast = this.typeInfo.end;
+      this.timeAvg = this.typeInfo.avg;
     }
   }
 
@@ -48,7 +47,8 @@ class Network {
       idx: idx,
       numberOfSplits: numberOfSplits,
       start: start,
-      end: end
+      end: end,
+      avg: (start + end) / 2
     }
   }
 
@@ -82,8 +82,8 @@ class Network {
         Network.typeSub(
           idx,
           numberOfSplits,
-          network.timeFirst,
-          network.timeLast
+          idx * timeInterval + network.timeFirst,
+          idx * (timeInterval + 1) + network.timeFirst,
         )
       );
     }
@@ -93,7 +93,6 @@ class Network {
     return network.subNetworks;
   }
 
-  // TODO: difference, union, intersaction
   static compare (a, b) {
     const nodes = Network.compareNodes(a.nodes, b.nodes);
     const links = Network.compareLinks(a.links, b.links);

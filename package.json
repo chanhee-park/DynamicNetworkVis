@@ -1,0 +1,35 @@
+{
+  "name": "dynamicnetworkvis",
+  "version": "1.0.0",
+  "description": "visualization system for exploring dynamic network",
+  "main": "index.js",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
+    "npm": "^6.14.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-react": "^7.9.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chanhee-park/DynamicNetworkVis.git"
+  },
+  "keywords": [
+    "visualization",
+    "dynamic-network"
+  ],
+  "author": "chanhee park",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chanhee-park/DynamicNetworkVis/issues"
+  },
+  "homepage": "https://github.com/chanhee-park/DynamicNetworkVis#readme"
+}

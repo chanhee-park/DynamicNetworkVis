@@ -1,5 +1,6 @@
 :root {
   --section-title-box-height: 20px;
+  --padding-for-section: 3px;
 }
 
 * {
@@ -9,13 +10,17 @@
 
 body {
   background: #aaa;
-  width: calc(100vw);
-  min-width: 980px;
+  width: 1920px;
+  height: 1280px;
 
   /* max ratio is 4:3 and min ratio is 2:1 */
+  /* 
+  width: calc(100vw); 
+  min-width: 1920px;
   height: calc(100vh);
   max-height: calc(0.75 * 100vw);
-  min-height: calc(0.50 * 100vw);
+  min-height: calc(0.50 * 100vw);  
+  */
 
   padding: 0;
   margin: 0;
@@ -26,7 +31,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 3px;
+  padding: var(--padding-for-section);
   background: #fff;
   border: 1px solid #555;
   display: flex;
@@ -36,7 +41,7 @@ body {
 /* container-group */
 .container-group {
   width: 100%;
-  padding: 3px;
+  padding: var(--padding-for-section);
 }
 
 .container-group.top {
@@ -58,9 +63,9 @@ body {
 /* container */
 .container {
   border: 1px solid #777;
-  padding: 3px;
   width: 100%;
   height: 100%;
+  padding: var(--padding-for-section);
 }
 
 /* svgs */
