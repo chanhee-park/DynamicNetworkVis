@@ -14,58 +14,65 @@
 
 <body>
   <div class="app">
-    <div class="section-group top">
 
-      <!--Time Slider-->
-      <section id="time-zone">
-        <!-- <div class="section-title">Time Slider</div> -->
-        <svg id='vis-time'> </svg>
-      </section>
+    <!-- TOP START -->
+    <div class="container-group top">
 
-    </div>
+      <!-- Time Line -->
+      <div class="container"
+           id='timeline-container'></div>
 
-    <div class="section-group body">
-
-      <!--Scatter Plot-->
-      <section id="scatter-zone">
-        <!-- <div class="section-title">Scatter Plot</div> -->
-      </section>
-
-      <!--Parallel Coordinate-->
-      <section id="parallel-zone">
-        <!-- <div class="section-title">Parallel Coordinate</div> -->
-      </section>
+      <div id="tooltip"
+           class="hidden">
+        <p><strong>Network is changed</strong></p>
+        <p><span id="value">-</span></p>
+      </div>
 
     </div>
+    <!-- TOP END -->
 
-    <div class="section-group bottom">
+    <!-- BODY START -->
+    <div class="container-group body">
 
-      <!--Small Multiples-->
-      <section id="smalls-zone">
-        <!-- <div class="section-title">Small Multiples</div> -->
-      </section>
+      <!-- Scatter Plot -->
+      <div class="container"
+           id='scatter-container'></div>
 
-      <section id="table-zone">
-        <!-- <div class="section-title">Nodes Statistics</div> -->
-      </section>
-
-      </section>
+      <!-- Parallel Coordinate -->
+      <div class="container"
+           id='parallel-container'></div>
 
     </div>
+    <!-- BODY END -->
 
+    <!-- BOTTOM START -->
+    <div class="container-group bottom">
+
+      <!-- Small Multiples -->
+      <div class="container"
+           id='smalls-container'></div>
+
+      <!-- Small Multiples -->
+      <div class="container"
+           id='table-container'></div>
+
+    </div>
+    <!-- BOTTOM END-->
 
   </div>
 
-  <div id="tooltip"
-       class="hidden">
-    <p><strong>Network is changed</strong></p>
-    <p><span id="value">100</span></p>
-  </div>
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"
+          crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+          crossorigin></script>
 
   <script src="scripts/util.js"></script>
   <script src="scripts/network.js"></script>
   <script src="scripts/data.js"></script>
+  <script src="scripts/component.timeline.js"></script>
   <script src="scripts/app.js"></script>
+
+
 </body>
 
 </html>
