@@ -71,8 +71,7 @@ function getTestData () {
     let elems = line.split(' ');
     if (elems[0].length > 0
       && elems[1].length > 0
-      && elems[2].length > 0
-      && Math.random() > 0) {
+      && elems[2].length > 0) {
 
       const from = parseInt(elems[0]);
       const to = parseInt(elems[1]);

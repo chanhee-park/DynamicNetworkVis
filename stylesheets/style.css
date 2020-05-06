@@ -1,6 +1,10 @@
+:root {
+  --section-title-box-height: 20px;
+}
+
 * {
   box-sizing: border-box;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
 }
 
 body {
@@ -45,7 +49,17 @@ body {
 /* section */
 section {
   border: 1px solid #777;
-  padding: 10px;
+  padding: 3px;
+  width: 100%;
+  height: 100%;
+}
+
+/* section>.section-title {
+  height: var(--section-title-box-height);
+} */
+
+/* svgs */
+section>svg {
   width: 100%;
   height: 100%;
 }
@@ -68,8 +82,29 @@ section#table-zone {
   flex: 4;
 }
 
-/* svgs */
-svg {
-  width: 100%;
-  height: 100%;
+
+/* tooltip */
+#tooltip {
+  position: absolute;
+  width: 500px;
+  height: auto;
+  padding: 10px;
+  background-color: white;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+#tooltip.hidden {
+  display: none;
+}
+
+#tooltip p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 28px;
 }

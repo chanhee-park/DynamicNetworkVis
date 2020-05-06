@@ -52,7 +52,7 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 20) {
+  static splitByTime (network, numberOfSplits = 30) {
     network.typeInfo.numberOfSplits = numberOfSplits;
 
     // get Time Interval

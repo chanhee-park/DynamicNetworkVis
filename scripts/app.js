@@ -1,6 +1,10 @@
 const mynetwork = getTestData();
 mynetwork.print();
 
+const COLOR_BAR_NODE = '#6200EE';
+const COLOR_BAR_LINK = '#26A69A';
+const COLOR_BAR_AXIS = '#CECFD3';
+
 // compare time by time
 const timeSliderInfo = getTimeSliderInfo(mynetwork.subNetworks);
 const bars = timeSliderInfo.bars
@@ -18,12 +22,9 @@ function getTimeSliderInfo (networks) {
     const comp = Network.compare(networks[i], networks[i + 1]);
     const adNodes = comp.nodes.postOnly.size;
     const rmNodes = comp.nodes.preOnly.size;
-
-    // TODO: 링크 개수에 루트스케일 괜찮은가요?
-    const adLinks = Math.sqrt(comp.links.postOnly.size);
-    const rmLinks = Math.sqrt(comp.links.preOnly.size);
-
-    bars.push({ adNodes, rmNodes, adLinks, rmLinks });
+    const adLinks = comp.links.postOnly.size;
+    const rmLinks = comp.links.preOnly.size;
+    bars.push({ adNodes, rmNodes, adLinks, rmLinks, comp });
     maxSize = Math.max(...[maxSize, adNodes, rmNodes, adLinks, rmLinks]);
   }
 
@@ -31,65 +32,148 @@ function getTimeSliderInfo (networks) {
 }
 
 function drawTimeSlider (svg, bars, max) {
-  // TODO: 매직넘버 없애기
-  const rectInterval = 1880 / (bars.length + 1);
-  const rectWidth = rectInterval / 4;
-  const centerY = 192 / 2;
-  const rectHeightRatio = centerY / (max * 1.5);
+  const svgBBox = svg.node().getBoundingClientRect();
+  const svgW = svgBBox.width;
+  const svgH = svgBBox.height;
 
+  const paddingRight = 200;
+  const paddingTop = 50;
+  const paddingBottom = 15;
 
-  svg.append('line').attrs({
-    x1: rectInterval / 4,
-    x2: 1880 - rectInterval / 4,
-    y1: centerY,
-    y2: centerY,
-    stroke: '#aaa'
-  });
+  const barInterval = (svgW - paddingRight) / (bars.length + 1);
+  const barW = barInterval / 4;
+  const barHRatio = (svgH - (paddingTop + paddingBottom)) / (Math.sqrt(max) * 2);
+  const centerY = (svgH - (paddingTop + paddingBottom)) / 2 + paddingTop;
 
-  for (let i = 0; i < bars.length; i++) {
+  // 제목을 그린다. 
+  svg.append('text')
+    .text('Network Change Timeline')
+    .attrs({
+      x: 10,
+      y: 10,
+      'text-anchor': 'start',
+      'alignment-baseline': 'hanging',
+      'font-size': 18
+    });
+
+  // 가로 보조선: 바의 높이를 설명한다.
+  const numOfAxisHor = 3; // 3 => 가운데, 중간 위(아래), 맨 위(아래)
+  for (let i = -numOfAxisHor + 1; i < numOfAxisHor; i++) {
+    const nodeVal = (i * Math.sqrt(max)) / (numOfAxisHor - 1);
+
+    // 가로 선
+    const xStart = barInterval - barW;
+    const xEnd = svgW - paddingRight;
+    const y = centerY - barHRatio * nodeVal;
 
     svg.append('line').attrs({
-      x1: (i + 0.75) * rectInterval + rectWidth,
-      x2: (i + 0.75) * rectInterval + rectWidth,
+      x1: xStart,
+      x2: xEnd,
+      y1: y,
+      y2: y,
+      stroke: COLOR_BAR_AXIS,
+      'stroke-width': i == 0 ? 3 : 1
+    });
+
+    if (i == numOfAxisHor - 1) {
+      svg.append('text')
+        .text('Nodes')
+        .attrs({
+          x: xEnd + 50,
+          y: y - 20,
+          'text-anchor': 'end',
+          'alignment-baseline': 'middle'
+        });
+      svg.append('text')
+        .text('Links')
+        .attrs({
+          x: xEnd + 150,
+          y: y - 20,
+          'text-anchor': 'end',
+          'alignment-baseline': 'middle'
+        });
+    }
+    // 노드 높이 설명
+    svg.append('text')
+      .text(Math.round(nodeVal))
+      .attrs({
+        x: xEnd + 50,
+        y: y,
+        'text-anchor': 'end',
+        'alignment-baseline': 'middle'
+      });
+
+    // 링크 높이 설명
+    const linkVal = Math.round((i * max) / (numOfAxisHor - 1));
+    svg.append('text')
+      .text(linkVal)
+      .attrs({
+        x: xEnd + 150,
+        y: y,
+        'text-anchor': 'end',
+        'alignment-baseline': 'middle'
+      });
+  }
+
+  // 시간을 순회하며 바를 그린다.
+  _.forEach(bars, (bar, i) => {
+    const x = (i + 1) * barInterval;
+
+    // 세로 보조선: 노드바와 링크바 사이에 그린다.
+    svg.append('line').attrs({
+      x1: x + barW,
+      x2: x + barW,
       y1: centerY - 10,
       y2: centerY + 10,
-      stroke: '#aaa'
-    })
+      stroke: COLOR_BAR_AXIS
+    });
 
-    svg.append('rect').attrs({
-      x: (i + 0.75) * rectInterval,
-      y: centerY - bars[i].adNodes * rectHeightRatio,
-      width: rectWidth,
-      height: bars[i].adNodes * rectHeightRatio,
-      fill: '#05A'
+    // 바 그리기
+    const values = [bar['adNodes'], bar['rmNodes'], bar['adLinks'], bar['rmLinks']];
+
+    // TODO: 텍스트 정렬: html / css 로 영역을 잡아버리자.
+    const tooltipTxt = `
+      Nodes: +${bar['adNodes']}  /  -${bar['rmNodes']} <br>
+      Links: +${bar['adLinks']}  /  -${bar['rmLinks']}
+    `
+    console.log(bar);
+    _.forEach(values, (value, j) => {
+      const isAdded = j % 2 == 0;  // [added, removed, added, removed]
+      const isNode = j < 1;        // [node, node, link, link]
+
+      const barH = barHRatio * (isNode ? value : Math.sqrt(value))
+      const barY = centerY - (isAdded ? barH : 0);
+      const barX = isNode ? x : x + barW;
+      const fill = isNode ? COLOR_BAR_NODE : COLOR_BAR_LINK;
+
+      svg.append('rect').attrs({
+        x: barX,
+        y: barY,
+        width: barW,
+        height: barH,
+        fill: fill
+      }).on("mouseover", function () {
+        var xPosition = parseFloat(d3.select(this).attr("x")) + 50;
+        var yPosition = parseFloat(d3.select(this).attr("y")) + 50;
+        d3.select("#tooltip")
+          .style("left", xPosition + "px")
+          .style("top", yPosition + "px")
+          .select("#value")
+          .html(tooltipTxt);
+        d3.select("#tooltip").classed("hidden", false);
+      }).on("mouseout", function () {
+        d3.select("#tooltip").classed("hidden", true);
+      })
     });
-    svg.append('rect').attrs({
-      x: (i + 0.75) * rectInterval,
-      y: centerY,
-      width: rectWidth,
-      height: bars[i].rmNodes * rectHeightRatio,
-      fill: '#05A'
-    });
-    svg.append('rect').attrs({
-      x: (i + 0.75) * rectInterval + rectWidth,
-      y: centerY - bars[i].adLinks * rectHeightRatio,
-      width: rectWidth,
-      height: bars[i].adLinks * rectHeightRatio,
-      fill: '#0A5'
-    });
-    svg.append('rect').attrs({
-      x: (i + 0.75) * rectInterval + rectWidth,
-      y: centerY,
-      width: rectWidth,
-      height: bars[i].rmLinks * rectHeightRatio,
-      fill: '#0A5'
-    });
-  }
+  });
+
+
 }
 
 
+// TODO: REACT 적용 
 
-// TODO: Time Slider 그리기
+// TODO: Time Slider 코드 리펙토링 / 함수 분리 / 모듈화
 
 // TODO: P-coord 그리기
 
