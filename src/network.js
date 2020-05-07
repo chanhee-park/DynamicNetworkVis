@@ -1,4 +1,3 @@
-
 class Network {
   constructor(nodes, links, times, typeInfo) {
     this.typeInfo = typeof typeInfo !== 'undefined' ? typeInfo : Network.typeTotal();
@@ -9,11 +8,13 @@ class Network {
     this.timeLast = Util.max(this.times);
 
     this.subNetworks = undefined;
-    if (this.typeInfo.type == Network.typeTotal().type) {
+    this.compareInfo = undefined;
+    if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
       this.subNetworks = Network.splitByTime(this);
+      this.compareInfo = Network.compareSeveral(this.subNetworks);
     } else {
-      this.timeFirst = this.typeInfo.start;
-      this.timeLast = this.typeInfo.end;
+      this.timeFirst = this.typeInfo.first;
+      this.timeLast = this.typeInfo.last;
       this.timeAvg = this.typeInfo.avg;
     }
   }
@@ -41,14 +42,14 @@ class Network {
     return { type: 'TOTAL', numberOfSplits: 20 }
   }
 
-  static typeSub (idx, numberOfSplits, start, end) {
+  static typeSub (idx, numberOfSplits, first, last) {
     return {
       type: 'SUB',
       idx: idx,
       numberOfSplits: numberOfSplits,
-      start: start,
-      end: end,
-      avg: (start + end) / 2
+      first: first,
+      last: last,
+      avg: (first + last) / 2
     }
   }
 
@@ -93,10 +94,36 @@ class Network {
     return network.subNetworks;
   }
 
-  static compare (a, b) {
-    const nodes = Network.compareNodes(a.nodes, b.nodes);
-    const links = Network.compareLinks(a.links, b.links);
-    return { nodes, links };
+  static compareSeveral (networks) {
+    const N = networks.length;
+    const ret = [...Array(N)].map(x => Array(N).fill(0));
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        ret[i][j] = this.compare(networks[i], networks[j]);
+      }
+    }
+    return ret;
+  }
+
+  static compare (n1, n2) {
+    const nodes = Network.compareNodes(n1.nodes, n2.nodes);
+    const links = Network.compareLinks(n1.links, n2.links);
+
+    const sizes = {
+      nc: nodes.common.size,
+      n1: nodes.preOnly.size,
+      n2: nodes.postOnly.size,
+      lc: links.common.size,
+      l1: links.preOnly.size,
+      l2: links.postOnly.size,
+    }
+    const roughN = (sizes.nc + 1) / (sizes.nc + sizes.n1 + sizes.n2 + 1);
+    const roughL = (sizes.lc + 1) / (sizes.lc + sizes.l1 + sizes.l2 + 1);
+    const similarity = {
+      rough: 0.75 * roughN + 0.25 * roughL,
+    }
+
+    return { nodes, links, similarity };
   }
 
   static compareNodes (nodes, otherNodes) {

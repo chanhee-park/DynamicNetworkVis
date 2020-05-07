@@ -1,10 +1,14 @@
 var mynetwork = getTestData();
 
 var PADDING_FOR_SECTION = 3;
-var COLOR_BAR_ADD = '#68C';
-var COLOR_BAR_RMD = '#C77';
-var COLOR_BAR_COM = '#CCC';
-var COLOR_BAR_AXIS = '#CECFD3';
+// TODO: 노드랑 엣지의 색상 밝기를 다르게 할까?
+var COLOR_BAR_ADD_N = '#68C';
+var COLOR_BAR_ADD_L = '#46B';
+var COLOR_BAR_RMD_N = '#C68';
+var COLOR_BAR_RMD_L = '#B64';
+var COLOR_BAR_COM_N = '#CCC';
+var COLOR_BAR_COM_L = '#AAA';
+var COLOR_BAR_AXIS = '#CCC';
 
 var containerId = '#timeline-container';
 var element = React.createElement(Timeline, {
@@ -15,10 +19,7 @@ var element = React.createElement(Timeline, {
 var container = document.querySelector(containerId);
 ReactDOM.render(element, container);
 
-// draw time slider
-function drawTimeSlider(svg, bars, max) {}
-
-// TODO: REACT 적용 
+// TODO: REACT 제대로 적용 
 
 // TODO: Time Slider 코드 리펙토링 / 함수 분리 / 모듈화
 

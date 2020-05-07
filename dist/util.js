@@ -19,6 +19,17 @@ var Util = {
     return result;
   },
 
+  getSVG: function getSVG(containerId) {
+    var container = d3.select(containerId);
+    var containerBounding = container.node().getBoundingClientRect();
+    var svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
+    var svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
+
+    var svg = container.append("svg").attr("width", svgW).attr("height", svgH);
+
+    return svg;
+  },
+
   min: function min(arrayLike) {
     var min = +Infinity;
     var _iteratorNormalCompletion = true;
@@ -134,7 +145,7 @@ var Util = {
 
   _.forEach(lines, function (line) {
     var elems = line.split(' ');
-    if (elems[0].length > 0 && elems[1].length > 0 && elems[2].length > 0) {
+    if (elems[0].length > 0 && elems[1].length > 0 && elems[2].length > 0 && Math.random() > 0.9) {
 
       var from = parseInt(elems[0]);
       var to = parseInt(elems[1]);

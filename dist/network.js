@@ -16,11 +16,13 @@ var Network = function () {
     this.timeLast = Util.max(this.times);
 
     this.subNetworks = undefined;
-    if (this.typeInfo.type == Network.typeTotal().type) {
+    this.compareInfo = undefined;
+    if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
       this.subNetworks = Network.splitByTime(this);
+      this.compareInfo = Network.compareSeveral(this.subNetworks);
     } else {
-      this.timeFirst = this.typeInfo.start;
-      this.timeLast = this.typeInfo.end;
+      this.timeFirst = this.typeInfo.first;
+      this.timeLast = this.typeInfo.last;
       this.timeAvg = this.typeInfo.avg;
     }
   }
@@ -57,14 +59,14 @@ var Network = function () {
     }
   }, {
     key: 'typeSub',
-    value: function typeSub(idx, numberOfSplits, start, end) {
+    value: function typeSub(idx, numberOfSplits, first, last) {
       return {
         type: 'SUB',
         idx: idx,
         numberOfSplits: numberOfSplits,
-        start: start,
-        end: end,
-        avg: (start + end) / 2
+        first: first,
+        last: last,
+        avg: (first + last) / 2
       };
     }
   }, {
@@ -130,11 +132,40 @@ var Network = function () {
       return network.subNetworks;
     }
   }, {
+    key: 'compareSeveral',
+    value: function compareSeveral(networks) {
+      var N = networks.length;
+      var ret = [].concat(_toConsumableArray(Array(N))).map(function (x) {
+        return Array(N).fill(0);
+      });
+      for (var i = 0; i < N; i++) {
+        for (var j = i + 1; j < N; j++) {
+          ret[i][j] = this.compare(networks[i], networks[j]);
+        }
+      }
+      return ret;
+    }
+  }, {
     key: 'compare',
-    value: function compare(a, b) {
-      var nodes = Network.compareNodes(a.nodes, b.nodes);
-      var links = Network.compareLinks(a.links, b.links);
-      return { nodes: nodes, links: links };
+    value: function compare(n1, n2) {
+      var nodes = Network.compareNodes(n1.nodes, n2.nodes);
+      var links = Network.compareLinks(n1.links, n2.links);
+
+      var sizes = {
+        nc: nodes.common.size,
+        n1: nodes.preOnly.size,
+        n2: nodes.postOnly.size,
+        lc: links.common.size,
+        l1: links.preOnly.size,
+        l2: links.postOnly.size
+      };
+      var roughN = (sizes.nc + 1) / (sizes.nc + sizes.n1 + sizes.n2 + 1);
+      var roughL = (sizes.lc + 1) / (sizes.lc + sizes.l1 + sizes.l2 + 1);
+      var similarity = {
+        rough: 0.75 * roughN + 0.25 * roughL
+      };
+
+      return { nodes: nodes, links: links, similarity: similarity };
     }
   }, {
     key: 'compareNodes',

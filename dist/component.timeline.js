@@ -32,15 +32,13 @@ var Timeline = function (_React$Component) {
     key: 'createTimeline',
     value: function createTimeline() {
       // get time compared data
-      var subNetworks = this.props.network.subNetworks;
-      console.log(subNetworks);
-      var timelineInfo = this.getTimelineInfo(subNetworks);
+      var timelineInfo = this.getTimelineInfo(this.props.network);
       var bars = timelineInfo.bars;
       var max = timelineInfo.maxSize;
       var avgTimes = timelineInfo.avgTimes;
 
       // set rendering size
-      var svg = getSVG(this.props.containerId);
+      var svg = Util.getSVG(this.props.containerId);
 
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
@@ -77,7 +75,7 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_COM
+        fill: COLOR_BAR_COM_N
       });
       svg.append('text').text('Remained').attrs({
         x: colorLegendXStart + barW * 1.2,
@@ -92,7 +90,7 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_ADD
+        fill: COLOR_BAR_ADD_N
       });
       svg.append('text').text('Added').attrs({
         x: colorLegendXStart + colorLegendW + barW * 1.2,
@@ -107,7 +105,7 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_RMD
+        fill: COLOR_BAR_RMD_N
       });
       svg.append('text').text('Disappeared').attrs({
         x: colorLegendXStart + colorLegendW * 2 + barW * 1.2,
@@ -209,22 +207,22 @@ var Timeline = function (_React$Component) {
           var barH = barHRatio * (isNode ? value : Math.sqrt(value));
           var barX = isNode ? x : x + barW;
           var barY = 0;
-          var fill = COLOR_BAR_COM;
+          var fill = COLOR_BAR_COM_N;
 
           if (type == 0) {
             // removed
             barY = centerY;
-            fill = COLOR_BAR_RMD;
+            fill = isNode ? COLOR_BAR_RMD_N : COLOR_BAR_RMD_L;
           } else if (type == 1) {
             // added
             var comV = values[j + 1];
             var comBarH = barHRatio * (isNode ? comV : Math.sqrt(comV));
             barY = centerY - barH - comBarH;
-            fill = COLOR_BAR_ADD;
+            fill = isNode ? COLOR_BAR_ADD_N : COLOR_BAR_ADD_L;
           } else {
             // common
             barY = centerY - barH;
-            fill = COLOR_BAR_COM;
+            fill = isNode ? COLOR_BAR_COM_N : COLOR_BAR_COM_L;
           }
 
           svg.append('rect').attrs({
@@ -246,18 +244,21 @@ var Timeline = function (_React$Component) {
     }
   }, {
     key: 'getTimelineInfo',
-    value: function getTimelineInfo(networks) {
-      var ret = [Network.compare(new Network(), networks[0])];
-      var avgTimes = [networks[0].timeAvg];
-      var maxSize = Math.max(networks[0].nodes.size, networks[0].links.size);
-      for (var i = 1; i < networks.length; i++) {
-        var n0 = networks[i - 1];
-        var n1 = networks[i];
-        avgTimes.push((n1.timeFirst + n1.timeLast) / 2);
-        ret.push(Network.compare(n0, n1));
-        maxSize = Math.max.apply(Math, [maxSize, n1.nodes.size, n1.links.size]);
+    value: function getTimelineInfo(totalNetwork) {
+      var subNetworks = totalNetwork.subNetworks;
+
+      var ret = [Network.compare(new Network(), subNetworks[0])];
+      var sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
+      var avgTimes = [subNetworks[0]];
+
+      for (var i = 1; i < subNetworks.length; i++) {
+        ret.push(totalNetwork.compareInfo[i - 1][i]);
+        sizes.push(subNetworks[i].nodes.size);
+        sizes.push(subNetworks[i].links.size);
+        avgTimes.push(subNetworks[i].timeAvg);
       }
-      return { bars: ret, maxSize: maxSize, avgTimes: avgTimes };
+
+      return { bars: ret, maxSize: Util.max(sizes), avgTimes: avgTimes };
     }
   }, {
     key: 'render',
@@ -268,14 +269,3 @@ var Timeline = function (_React$Component) {
 
   return Timeline;
 }(React.Component);
-
-function getSVG(containerId) {
-  var container = d3.select(containerId);
-  var containerBounding = container.node().getBoundingClientRect();
-  var svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
-  var svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
-
-  var svg = container.append("svg").attr("width", svgW).attr("height", svgH);
-
-  return svg;
-}

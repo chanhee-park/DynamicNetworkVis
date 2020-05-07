@@ -14,15 +14,13 @@ class Timeline extends React.Component {
 
   createTimeline () {
     // get time compared data
-    const subNetworks = this.props.network.subNetworks;
-    console.log(subNetworks);
-    const timelineInfo = this.getTimelineInfo(subNetworks);
+    const timelineInfo = this.getTimelineInfo(this.props.network);
     const bars = timelineInfo.bars;
     const max = timelineInfo.maxSize;
     const avgTimes = timelineInfo.avgTimes;
 
     // set rendering size
-    const svg = getSVG(this.props.containerId);
+    const svg = Util.getSVG(this.props.containerId);
 
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
@@ -61,7 +59,7 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_COM
+      fill: COLOR_BAR_COM_N
     });
     svg.append('text')
       .text('Remained')
@@ -78,7 +76,7 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_ADD
+      fill: COLOR_BAR_ADD_N
     });
     svg.append('text')
       .text('Added')
@@ -95,7 +93,7 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_RMD
+      fill: COLOR_BAR_RMD_N
     });
     svg.append('text')
       .text('Disappeared')
@@ -213,19 +211,19 @@ class Timeline extends React.Component {
         const barH = barHRatio * (isNode ? value : Math.sqrt(value));
         const barX = isNode ? x : x + barW;
         let barY = 0;
-        let fill = COLOR_BAR_COM;
+        let fill = COLOR_BAR_COM_N;
 
         if (type == 0) {  // removed
           barY = centerY;
-          fill = COLOR_BAR_RMD
+          fill = isNode ? COLOR_BAR_RMD_N : COLOR_BAR_RMD_L;
         } else if (type == 1) { // added
           const comV = values[j + 1];
           const comBarH = barHRatio * (isNode ? comV : Math.sqrt(comV));
           barY = centerY - barH - comBarH;
-          fill = COLOR_BAR_ADD
+          fill = isNode ? COLOR_BAR_ADD_N : COLOR_BAR_ADD_L;
         } else {  // common
           barY = centerY - barH;
-          fill = COLOR_BAR_COM
+          fill = isNode ? COLOR_BAR_COM_N : COLOR_BAR_COM_L;
         }
 
         svg.append('rect').attrs({
@@ -248,23 +246,23 @@ class Timeline extends React.Component {
         })
       });
     });
-
-
-
   }
 
-  getTimelineInfo (networks) {
-    const ret = [Network.compare(new Network(), networks[0])];
-    const avgTimes = [networks[0].timeAvg];
-    let maxSize = Math.max(networks[0].nodes.size, networks[0].links.size);
-    for (let i = 1; i < networks.length; i++) {
-      const n0 = networks[i - 1];
-      const n1 = networks[i];
-      avgTimes.push((n1.timeFirst + n1.timeLast) / 2)
-      ret.push(Network.compare(n0, n1));
-      maxSize = Math.max(...[maxSize, n1.nodes.size, n1.links.size]);
+  getTimelineInfo (totalNetwork) {
+    const subNetworks = totalNetwork.subNetworks;
+
+    const ret = [Network.compare(new Network(), subNetworks[0])];
+    const sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
+    const avgTimes = [subNetworks[0]];
+
+    for (let i = 1; i < subNetworks.length; i++) {
+      ret.push(totalNetwork.compareInfo[i - 1][i]);
+      sizes.push(subNetworks[i].nodes.size);
+      sizes.push(subNetworks[i].links.size);
+      avgTimes.push(subNetworks[i].timeAvg);
     }
-    return { bars: ret, maxSize, avgTimes };
+
+    return { bars: ret, maxSize: Util.max(sizes), avgTimes };
   }
 
   render () {
@@ -272,16 +270,4 @@ class Timeline extends React.Component {
   }
 }
 
-function getSVG (containerId) {
-  const container = d3.select(containerId);
-  const containerBounding = container.node().getBoundingClientRect();
-  const svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
-  const svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
 
-  const svg = container
-    .append("svg")
-    .attr("width", svgW)
-    .attr("height", svgH);
-
-  return svg;
-}

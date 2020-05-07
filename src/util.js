@@ -17,6 +17,20 @@ const Util = {
     return result;
   },
 
+  getSVG: (containerId) => {
+    const container = d3.select(containerId);
+    const containerBounding = container.node().getBoundingClientRect();
+    const svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
+    const svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
+
+    const svg = container
+      .append("svg")
+      .attr("width", svgW)
+      .attr("height", svgH);
+
+    return svg;
+  },
+
   min: (arrayLike) => {
     let min = +Infinity;
     for (let item of arrayLike) {
@@ -71,7 +85,8 @@ function getTestData () {
     let elems = line.split(' ');
     if (elems[0].length > 0
       && elems[1].length > 0
-      && elems[2].length > 0) {
+      && elems[2].length > 0
+      && Math.random() > 0.9) {
 
       const from = parseInt(elems[0]);
       const to = parseInt(elems[1]);
