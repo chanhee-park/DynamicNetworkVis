@@ -1,35 +1,42 @@
-const mynetwork = getTestData();
-
+// const values
 const PADDING_FOR_SECTION = 3;
-const COLOR_BAR_ADD_N = '#68C';
-const COLOR_BAR_ADD_L = '#46B';
-const COLOR_BAR_RMD_N = '#C68';
-const COLOR_BAR_RMD_L = '#B53';
-const COLOR_BAR_COM_N = '#CCC';
-const COLOR_BAR_COM_L = '#BBB';
-const COLOR_BAR_AXIS = '#CCC';
+const COLOR_ADD_NODE = '#68C';
+const COLOR_ADD_LINK = '#46B';
+const COLOR_RMD_NODE = '#C68';
+const COLOR_RMD_LINK = '#B53';
+const COLOR_COM_NODE = '#CCC';
+const COLOR_COM_LINK = '#BBB';
+const COLOR_NETWORK = COLOR_COM_NODE;
+const COLOR_AXIS = '#CCC';
 
-const containerId = `#timeline-container`;
-const element = <Timeline
-  title="Network Change Timeline"
-  containerId={containerId}
-  network={mynetwork}
-/>;
-const container = document.querySelector(containerId);
-ReactDOM.render(element, container);
+// my test network dataset
+const mynetwork = getTestData(Data.testset2);
 
+// visualizations on my app
+const visualizations = {
+  timeline: {
+    containerId: '#timeline-container',
+    element: <Timeline
+      title="Network Change Timeline"
+      containerId='#timeline-container'
+      network={mynetwork}
+    />
+  },
+  scatter: {
+    containerId: '#scatter-container',
+    element: <ScatterPlot
+      title="Network Similarity Between The Time"
+      containerId='#scatter-container'
+      network={mynetwork}
+    />
+  }
+}
 
-// TODO: scatter plot 그리기
-const adjmtx = [
-  [1, 1, 1, 0, 0, 0],
-  [1, 1, 1, 0, 0, 0],
-  [1, 1, 1, 0, 0, 0],
-  [0, 0, 0, 1, 1, 0],
-  [0, 0, 0, 1, 1, 1],
-  [0, 0, 0, 0, 1, 1]
-];
-var vectors = PCA.getEigenVectors(adjmtx);
-console.log(vectors);
+_.forEach(visualizations, (vis, key) => {
+  const container = document.querySelector(vis.containerId);
+  const element = vis.element;
+  ReactDOM.render(element, container);
+});
 
 
 // TODO: REACT 제대로 적용

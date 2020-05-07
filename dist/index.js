@@ -1,27 +1,42 @@
-var mynetwork = getTestData();
-
+// const values
 var PADDING_FOR_SECTION = 3;
-var COLOR_BAR_ADD_N = '#68C';
-var COLOR_BAR_ADD_L = '#46B';
-var COLOR_BAR_RMD_N = '#C68';
-var COLOR_BAR_RMD_L = '#B53';
-var COLOR_BAR_COM_N = '#CCC';
-var COLOR_BAR_COM_L = '#BBB';
-var COLOR_BAR_AXIS = '#CCC';
+var COLOR_ADD_NODE = '#68C';
+var COLOR_ADD_LINK = '#46B';
+var COLOR_RMD_NODE = '#C68';
+var COLOR_RMD_LINK = '#B53';
+var COLOR_COM_NODE = '#CCC';
+var COLOR_COM_LINK = '#BBB';
+var COLOR_NETWORK = COLOR_COM_NODE;
+var COLOR_AXIS = '#CCC';
 
-var containerId = '#timeline-container';
-var element = React.createElement(Timeline, {
-  title: 'Network Change Timeline',
-  containerId: containerId,
-  network: mynetwork
+// my test network dataset
+var mynetwork = getTestData(Data.testset2);
+
+// visualizations on my app
+var visualizations = {
+  timeline: {
+    containerId: '#timeline-container',
+    element: React.createElement(Timeline, {
+      title: 'Network Change Timeline',
+      containerId: '#timeline-container',
+      network: mynetwork
+    })
+  },
+  scatter: {
+    containerId: '#scatter-container',
+    element: React.createElement(ScatterPlot, {
+      title: 'Network Similarity Between The Time',
+      containerId: '#scatter-container',
+      network: mynetwork
+    })
+  }
+};
+
+_.forEach(visualizations, function (vis, key) {
+  var container = document.querySelector(vis.containerId);
+  var element = vis.element;
+  ReactDOM.render(element, container);
 });
-var container = document.querySelector(containerId);
-ReactDOM.render(element, container);
-
-// TODO: scatter plot 그리기
-var adjmtx = [[1, 1, 1, 0, 0, 0], [1, 1, 1, 0, 0, 0], [1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0], [0, 0, 0, 1, 1, 1], [0, 0, 0, 0, 1, 1]];
-var vectors = PCA.getEigenVectors(adjmtx);
-console.log(vectors);
 
 // TODO: REACT 제대로 적용
 

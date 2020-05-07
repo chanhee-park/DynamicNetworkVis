@@ -129,14 +129,59 @@ var Util = {
     }
 
     return { preOnly: preOnly, postOnly: postOnly, common: common };
+  },
+
+  pca: function pca(arr2d) {
+    var dimensions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    var pcaVal = PCA.getEigenVectors(arr2d);
+    var ret = [];
+    _.forEach(pcaVal, function (v) {
+      var val = [];
+      for (var i = 0; i < dimensions; i++) {
+        val.push(v.vector[i]);
+      }
+      ret.push(val);
+    });
+
+    return ret;
+  },
+
+  mds: function mds(distances) {
+    var dimensions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+    // square distances
+    var M = numeric.mul(-.5, numeric.pow(distances, 2));
+
+    // double centre the rows/columns
+    function mean(A) {
+      return numeric.div(numeric.add.apply(null, A), A.length);
+    }
+    var rowMeans = mean(M),
+        colMeans = mean(numeric.transpose(M)),
+        totalMean = mean(rowMeans);
+
+    for (var i = 0; i < M.length; ++i) {
+      for (var j = 0; j < M[0].length; ++j) {
+        M[i][j] += totalMean - rowMeans[i] - colMeans[j];
+      }
+    }
+
+    // take the SVD of the double centred matrix, and return the points from it
+    var ret = numeric.svd(M),
+        eigenValues = numeric.sqrt(ret.S);
+    return ret.U.map(function (row) {
+      return numeric.mul(row, eigenValues).splice(0, dimensions);
+    });
   }
 
   /**
    * 테스트 데이터를 불러온다.
    * from './dataset/copresence-InVS13/copresence-InVS13.edges'
    */
-};function getTestData() {
-  var res = Util.loadFile(Data.testset);
+};function getTestData(testset) {
+  console.log(testset);
+  var res = Util.loadFile(testset.url);
   var lines = res.split('\n');
 
   var nodes = new Set();;
@@ -145,11 +190,12 @@ var Util = {
 
   _.forEach(lines, function (line) {
     var elems = line.split(' ');
-    if (elems[0].length > 0 && elems[1].length > 0 && elems[2].length > 0 && Math.random() > 0.9) {
 
-      var from = parseInt(elems[0]);
-      var to = parseInt(elems[1]);
-      var time = parseInt(elems[2]);
+    if (elems[testset.n1idx].length > 0 && elems[testset.n2idx].length > 0 && elems[testset.tidx].length > 0 && Math.random() > 0.9) {
+
+      var from = parseInt(elems[testset.n1idx]);
+      var to = parseInt(elems[testset.n2idx]);
+      var time = parseInt(elems[testset.tidx]);
 
       nodes.add(from).add(to);
       times.add(time);

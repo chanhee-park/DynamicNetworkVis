@@ -17,9 +17,13 @@ var Network = function () {
 
     this.subNetworks = undefined;
     this.compareInfo = undefined;
+    this.subNetDistances = undefined;
+    this.emptySubNets = undefined;
     if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
       this.subNetworks = Network.splitByTime(this);
+      this.emptySubNets = Network.getEmptyNetworksIdx(this.subNetworks);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
+      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.emptySubNets);
     } else {
       this.timeFirst = this.typeInfo.first;
       this.timeLast = this.typeInfo.last;
@@ -72,7 +76,7 @@ var Network = function () {
   }, {
     key: 'splitByTime',
     value: function splitByTime(network) {
-      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 30;
+      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 39;
 
       network.typeInfo.numberOfSplits = numberOfSplits;
 
@@ -124,12 +128,42 @@ var Network = function () {
 
       var spNetworks = [Array(numberOfSplits), undefined];
       for (var idx = 0; idx < numberOfSplits; idx++) {
-        spNetworks[idx] = new Network(spNodes[idx], spLinks[idx], spTimes[idx], Network.typeSub(idx, numberOfSplits, idx * timeInterval + network.timeFirst, idx * (timeInterval + 1) + network.timeFirst));
+        spNetworks[idx] = new Network(spNodes[idx], spLinks[idx], spTimes[idx], Network.typeSub(idx, numberOfSplits, timeInterval * (idx + 0) + network.timeFirst, timeInterval * (idx + 1) + network.timeFirst));
       }
 
       // assign and return
       network.subNetworks = spNetworks;
       return network.subNetworks;
+    }
+  }, {
+    key: 'getEmptyNetworksIdx',
+    value: function getEmptyNetworksIdx(networks) {
+      ret = [];
+      _.forEach(networks, function (n, i) {
+        if (n.nodes.size == 0) {
+          ret.push(i);
+        }
+      });
+      return ret;
+    }
+  }, {
+    key: 'getDistances',
+    value: function getDistances(compareInfo, similarityCriteria, emptyIdxs) {
+      var N = compareInfo.length;
+      var ret = [].concat(_toConsumableArray(Array(N))).map(function (x) {
+        return Array(N).fill(0);
+      });
+      for (var i = 0; i < compareInfo.length; i++) {
+        ret[i][i] = 0;
+        for (var j = i + 1; j < compareInfo.length; j++) {
+          if (j in emptyIdxs) continue;
+          var similarity = compareInfo[i][j].similarity[similarityCriteria];
+          var disimilarity = 1 - similarity;
+          ret[j][j] = disimilarity;
+          ret[j][i] = disimilarity;
+        }
+      }
+      return ret;
     }
   }, {
     key: 'compareSeveral',

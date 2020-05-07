@@ -9,9 +9,13 @@ class Network {
 
     this.subNetworks = undefined;
     this.compareInfo = undefined;
+    this.subNetDistances = undefined;
+    this.emptySubNets = undefined;
     if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
       this.subNetworks = Network.splitByTime(this);
+      this.emptySubNets = Network.getEmptyNetworksIdx(this.subNetworks);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
+      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.emptySubNets);
     } else {
       this.timeFirst = this.typeInfo.first;
       this.timeLast = this.typeInfo.last;
@@ -53,12 +57,13 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 30) {
+  static splitByTime (network, numberOfSplits = 39) {
     network.typeInfo.numberOfSplits = numberOfSplits;
 
     // get Time Interval
     const timeDiff = network.timeLast - network.timeFirst + 0.0001;
     const timeInterval = timeDiff / numberOfSplits;
+
 
     // get splited nodes, links, times
     const spNodes = [...Array(numberOfSplits)].map(e => new Set());
@@ -83,8 +88,8 @@ class Network {
         Network.typeSub(
           idx,
           numberOfSplits,
-          idx * timeInterval + network.timeFirst,
-          idx * (timeInterval + 1) + network.timeFirst,
+          timeInterval * (idx + 0) + network.timeFirst,
+          timeInterval * (idx + 1) + network.timeFirst,
         )
       );
     }
@@ -92,6 +97,32 @@ class Network {
     // assign and return
     network.subNetworks = spNetworks;
     return network.subNetworks;
+  }
+
+  static getEmptyNetworksIdx (networks) {
+    ret = [];
+    _.forEach(networks, (n, i) => {
+      if (n.nodes.size == 0) {
+        ret.push(i);
+      }
+    });
+    return ret;
+  }
+
+  static getDistances (compareInfo, similarityCriteria, emptyIdxs) {
+    const N = compareInfo.length;
+    const ret = [...Array(N)].map(x => Array(N).fill(0));
+    for (let i = 0; i < compareInfo.length; i++) {
+      ret[i][i] = 0;
+      for (let j = i + 1; j < compareInfo.length; j++) {
+        if (j in emptyIdxs) continue;
+        const similarity = compareInfo[i][j].similarity[similarityCriteria];
+        const disimilarity = (1 - similarity);
+        ret[j][j] = disimilarity;
+        ret[j][i] = disimilarity;
+      }
+    }
+    return ret;
   }
 
   static compareSeveral (networks) {

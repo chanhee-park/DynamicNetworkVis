@@ -28,6 +28,9 @@ var Timeline = function (_React$Component) {
     value: function componentDidUpdate() {
       this.createTimeline();
     }
+
+    // TODO: 엣지 교집합 안생기는거 오류인지 확인
+
   }, {
     key: 'createTimeline',
     value: function createTimeline() {
@@ -39,7 +42,6 @@ var Timeline = function (_React$Component) {
 
       // set rendering size
       var svg = Util.getSVG(this.props.containerId);
-
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
       var svgH = svgBBox.height;
@@ -50,7 +52,7 @@ var Timeline = function (_React$Component) {
 
       var barInterval = (svgW - paddingRight) / (bars.length + 1);
       var barW = barInterval / 4;
-      var barHRatio = (svgH - (paddingTop + paddingBottom)) / (Math.sqrt(max) * 2);
+      var barHRatio = (svgH - (paddingTop + paddingBottom)) / (max * 2);
       var centerY = (svgH - (paddingTop + paddingBottom)) / 2 + paddingTop;
 
       var xStart = barInterval - barW;
@@ -76,14 +78,14 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_COM_N
+        fill: COLOR_COM_NODE
       });
       svg.append('rect').attrs({
         x: colorLegendXStart + barW - 1,
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_COM_L
+        fill: COLOR_COM_LINK
       });
       svg.append('text').text('Remained').attrs({
         x: colorLegendXStart + barW * 2.2,
@@ -99,14 +101,14 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_ADD_N
+        fill: COLOR_ADD_NODE
       });
       svg.append('rect').attrs({
         x: colorLegendXStart + colorLegendW + barW - 1,
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_ADD_L
+        fill: COLOR_ADD_LINK
       });
       svg.append('text').text('Added').attrs({
         x: colorLegendXStart + colorLegendW + barW * 2.2,
@@ -122,14 +124,14 @@ var Timeline = function (_React$Component) {
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_RMD_N
+        fill: COLOR_RMD_NODE
       });
       svg.append('rect').attrs({
         x: colorLegendXStart + colorLegendW * 2 + barW - 1,
         y: colorLegendY,
         width: barW,
         height: barW,
-        fill: COLOR_BAR_RMD_L
+        fill: COLOR_RMD_LINK
       });
       svg.append('text').text('Disappeared').attrs({
         x: colorLegendXStart + colorLegendW * 2 + barW * 2.2,
@@ -142,7 +144,7 @@ var Timeline = function (_React$Component) {
       // Legend - horizontal axis
       var numOfAxisHor = 3; // 3 => 가운데, 중간 위(아래), 맨 위(아래)
       for (var i = -numOfAxisHor + 1; i < numOfAxisHor; i++) {
-        var nodeVal = i * Math.sqrt(max) / (numOfAxisHor - 1);
+        var nodeVal = i * max / (numOfAxisHor - 1);
 
         // 가로 선
         var y = centerY - barHRatio * nodeVal;
@@ -152,7 +154,7 @@ var Timeline = function (_React$Component) {
           x2: xEnd,
           y1: y,
           y2: y,
-          stroke: COLOR_BAR_AXIS,
+          stroke: COLOR_AXIS,
           'stroke-width': i == 0 ? 3 : 1
         });
 
@@ -199,7 +201,7 @@ var Timeline = function (_React$Component) {
           x2: x + barW,
           y1: centerY - 10,
           y2: centerY + 10,
-          stroke: COLOR_BAR_AXIS
+          stroke: COLOR_AXIS
         });
 
         // 시간 표시
@@ -228,25 +230,25 @@ var Timeline = function (_React$Component) {
           var type = j % 3; // [removed, added, common]
           var isNode = j < 3; // [node, node, link, link]
 
-          var barH = barHRatio * (isNode ? value : Math.sqrt(value));
+          var barH = barHRatio * value;
           var barX = isNode ? x : x + barW;
           var barY = 0;
-          var fill = COLOR_BAR_COM_N;
+          var fill = COLOR_COM_NODE;
 
           if (type == 0) {
             // removed
             barY = centerY;
-            fill = isNode ? COLOR_BAR_RMD_N : COLOR_BAR_RMD_L;
+            fill = isNode ? COLOR_RMD_NODE : COLOR_RMD_LINK;
           } else if (type == 1) {
             // added
             var comV = values[j + 1];
-            var comBarH = barHRatio * (isNode ? comV : Math.sqrt(comV));
+            var comBarH = barHRatio * comV;
             barY = centerY - barH - comBarH;
-            fill = isNode ? COLOR_BAR_ADD_N : COLOR_BAR_ADD_L;
+            fill = isNode ? COLOR_ADD_NODE : COLOR_ADD_LINK;
           } else {
             // common
             barY = centerY - barH;
-            fill = isNode ? COLOR_BAR_COM_N : COLOR_BAR_COM_L;
+            fill = isNode ? COLOR_COM_NODE : COLOR_COM_LINK;
           }
 
           svg.append('rect').attrs({
@@ -273,7 +275,7 @@ var Timeline = function (_React$Component) {
 
       var ret = [Network.compare(new Network(), subNetworks[0])];
       var sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
-      var avgTimes = [subNetworks[0]];
+      var avgTimes = [subNetworks[0].timeAvg];
 
       for (var i = 1; i < subNetworks.length; i++) {
         ret.push(totalNetwork.compareInfo[i - 1][i]);

@@ -65,16 +65,54 @@ const Util = {
     }
 
     return { preOnly, postOnly, common }
-  }
+  },
 
+  pca: (arr2d, dimensions = 2) => {
+    const pcaVal = PCA.getEigenVectors(arr2d);
+    const ret = [];
+    _.forEach(pcaVal, (v) => {
+      const val = [];
+      for (let i = 0; i < dimensions; i++) {
+        val.push(v.vector[i]);
+      }
+      ret.push(val);
+    });
+
+    return ret;
+  },
+
+  mds: (distances, dimensions = 2) => {
+    // square distances
+    var M = numeric.mul(-.5, numeric.pow(distances, 2));
+
+    // double centre the rows/columns
+    function mean (A) { return numeric.div(numeric.add.apply(null, A), A.length); }
+    var rowMeans = mean(M),
+      colMeans = mean(numeric.transpose(M)),
+      totalMean = mean(rowMeans);
+
+    for (var i = 0; i < M.length; ++i) {
+      for (var j = 0; j < M[0].length; ++j) {
+        M[i][j] += totalMean - rowMeans[i] - colMeans[j];
+      }
+    }
+
+    // take the SVD of the double centred matrix, and return the points from it
+    var ret = numeric.svd(M),
+      eigenValues = numeric.sqrt(ret.S);
+    return ret.U.map(function (row) {
+      return numeric.mul(row, eigenValues).splice(0, dimensions);
+    });
+  },
 }
 
 /**
  * 테스트 데이터를 불러온다.
  * from './dataset/copresence-InVS13/copresence-InVS13.edges'
  */
-function getTestData () {
-  const res = Util.loadFile(Data.testset);
+function getTestData (testset) {
+  console.log(testset);
+  const res = Util.loadFile(testset.url);
   const lines = res.split('\n');
 
   let nodes = new Set();;
@@ -83,14 +121,15 @@ function getTestData () {
 
   _.forEach(lines, line => {
     let elems = line.split(' ');
-    if (elems[0].length > 0
-      && elems[1].length > 0
-      && elems[2].length > 0
-      && Math.random() > 0.9) {
 
-      const from = parseInt(elems[0]);
-      const to = parseInt(elems[1]);
-      const time = parseInt(elems[2]);
+    if (elems[testset.n1idx].length > 0 &&
+      elems[testset.n2idx].length > 0 &&
+      elems[testset.tidx].length > 0 &&
+      Math.random() > 0.9) {
+
+      const from = parseInt(elems[testset.n1idx]);
+      const to = parseInt(elems[testset.n2idx]);
+      const time = parseInt(elems[testset.tidx]);
 
       nodes.add(from).add(to);
       times.add(time);

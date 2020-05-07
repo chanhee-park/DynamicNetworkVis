@@ -1,7 +1,7 @@
 class Timeline extends React.Component {
   constructor(props) {
-    super(props)
-    this.createTimeline = this.createTimeline.bind(this)
+    super(props);
+    this.createTimeline = this.createTimeline.bind(this);
   }
 
   componentDidMount () {
@@ -12,6 +12,7 @@ class Timeline extends React.Component {
     this.createTimeline();
   }
 
+  // TODO: 엣지 교집합 안생기는거 오류인지 확인
   createTimeline () {
     // get time compared data
     const timelineInfo = this.getTimelineInfo(this.props.network);
@@ -21,7 +22,6 @@ class Timeline extends React.Component {
 
     // set rendering size
     const svg = Util.getSVG(this.props.containerId);
-
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
     const svgH = svgBBox.height;
@@ -32,7 +32,7 @@ class Timeline extends React.Component {
 
     const barInterval = (svgW - paddingRight) / (bars.length + 1);
     const barW = barInterval / 4;
-    const barHRatio = (svgH - (paddingTop + paddingBottom)) / (Math.sqrt(max) * 2);
+    const barHRatio = (svgH - (paddingTop + paddingBottom)) / (max * 2);
     const centerY = (svgH - (paddingTop + paddingBottom)) / 2 + paddingTop;
 
     const xStart = barInterval - barW;
@@ -60,14 +60,14 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_COM_N
+      fill: COLOR_COM_NODE
     });
     svg.append('rect').attrs({
       x: colorLegendXStart + barW - 1,
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_COM_L
+      fill: COLOR_COM_LINK
     });
     svg.append('text')
       .text('Remained')
@@ -85,14 +85,14 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_ADD_N
+      fill: COLOR_ADD_NODE
     });
     svg.append('rect').attrs({
       x: colorLegendXStart + colorLegendW + barW - 1,
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_ADD_L
+      fill: COLOR_ADD_LINK
     });
     svg.append('text')
       .text('Added')
@@ -110,14 +110,14 @@ class Timeline extends React.Component {
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_RMD_N
+      fill: COLOR_RMD_NODE
     });
     svg.append('rect').attrs({
       x: colorLegendXStart + colorLegendW * 2 + barW - 1,
       y: colorLegendY,
       width: barW,
       height: barW,
-      fill: COLOR_BAR_RMD_L
+      fill: COLOR_RMD_LINK
     });
     svg.append('text')
       .text('Disappeared')
@@ -133,7 +133,7 @@ class Timeline extends React.Component {
     // Legend - horizontal axis
     const numOfAxisHor = 3; // 3 => 가운데, 중간 위(아래), 맨 위(아래)
     for (let i = -numOfAxisHor + 1; i < numOfAxisHor; i++) {
-      const nodeVal = (i * Math.sqrt(max)) / (numOfAxisHor - 1);
+      const nodeVal = (i * max) / (numOfAxisHor - 1);
 
       // 가로 선
       const y = centerY - barHRatio * nodeVal;
@@ -143,7 +143,7 @@ class Timeline extends React.Component {
         x2: xEnd,
         y1: y,
         y2: y,
-        stroke: COLOR_BAR_AXIS,
+        stroke: COLOR_AXIS,
         'stroke-width': i == 0 ? 3 : 1
       });
 
@@ -198,7 +198,7 @@ class Timeline extends React.Component {
         x2: x + barW,
         y1: centerY - 10,
         y2: centerY + 10,
-        stroke: COLOR_BAR_AXIS
+        stroke: COLOR_AXIS
       });
 
       // 시간 표시
@@ -231,22 +231,22 @@ class Timeline extends React.Component {
         const type = j % 3;     // [removed, added, common]
         const isNode = j < 3;   // [node, node, link, link]
 
-        const barH = barHRatio * (isNode ? value : Math.sqrt(value));
+        const barH = barHRatio * value;
         const barX = isNode ? x : x + barW;
         let barY = 0;
-        let fill = COLOR_BAR_COM_N;
+        let fill = COLOR_COM_NODE;
 
         if (type == 0) {  // removed
           barY = centerY;
-          fill = isNode ? COLOR_BAR_RMD_N : COLOR_BAR_RMD_L;
+          fill = isNode ? COLOR_RMD_NODE : COLOR_RMD_LINK;
         } else if (type == 1) { // added
           const comV = values[j + 1];
-          const comBarH = barHRatio * (isNode ? comV : Math.sqrt(comV));
+          const comBarH = barHRatio * comV;
           barY = centerY - barH - comBarH;
-          fill = isNode ? COLOR_BAR_ADD_N : COLOR_BAR_ADD_L;
+          fill = isNode ? COLOR_ADD_NODE : COLOR_ADD_LINK;
         } else {  // common
           barY = centerY - barH;
-          fill = isNode ? COLOR_BAR_COM_N : COLOR_BAR_COM_L;
+          fill = isNode ? COLOR_COM_NODE : COLOR_COM_LINK;
         }
 
         svg.append('rect').attrs({
@@ -276,7 +276,7 @@ class Timeline extends React.Component {
 
     const ret = [Network.compare(new Network(), subNetworks[0])];
     const sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
-    const avgTimes = [subNetworks[0]];
+    const avgTimes = [subNetworks[0].timeAvg];
 
     for (let i = 1; i < subNetworks.length; i++) {
       ret.push(totalNetwork.compareInfo[i - 1][i]);
