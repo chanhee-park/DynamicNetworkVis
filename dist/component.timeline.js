@@ -66,10 +66,11 @@ var Timeline = function (_React$Component) {
       });
 
       // Legend - colors
-      var colorLegendW = 120;
-      var colorLegendXStart = xEnd - colorLegendW * 3;
+      var colorLegendW = 100;
+      var colorLegendXStart = xEnd - colorLegendW * 3.5;
       var colorLegendY = paddingTop - 30;
 
+      // Common Nodes & Links Color Legend
       svg.append('rect').attrs({
         x: colorLegendXStart,
         y: colorLegendY,
@@ -77,14 +78,22 @@ var Timeline = function (_React$Component) {
         height: barW,
         fill: COLOR_BAR_COM_N
       });
+      svg.append('rect').attrs({
+        x: colorLegendXStart + barW - 1,
+        y: colorLegendY,
+        width: barW,
+        height: barW,
+        fill: COLOR_BAR_COM_L
+      });
       svg.append('text').text('Remained').attrs({
-        x: colorLegendXStart + barW * 1.2,
+        x: colorLegendXStart + barW * 2.2,
         y: colorLegendY + barW / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',
         'font-size': 14
       });
 
+      // Added Nodes & Links Color Legend
       svg.append('rect').attrs({
         x: colorLegendXStart + colorLegendW,
         y: colorLegendY,
@@ -92,14 +101,22 @@ var Timeline = function (_React$Component) {
         height: barW,
         fill: COLOR_BAR_ADD_N
       });
+      svg.append('rect').attrs({
+        x: colorLegendXStart + colorLegendW + barW - 1,
+        y: colorLegendY,
+        width: barW,
+        height: barW,
+        fill: COLOR_BAR_ADD_L
+      });
       svg.append('text').text('Added').attrs({
-        x: colorLegendXStart + colorLegendW + barW * 1.2,
+        x: colorLegendXStart + colorLegendW + barW * 2.2,
         y: colorLegendY + barW / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',
         'font-size': 14
       });
 
+      // Disappeared Nodes & Links Color Legend
       svg.append('rect').attrs({
         x: colorLegendXStart + colorLegendW * 2,
         y: colorLegendY,
@@ -107,8 +124,15 @@ var Timeline = function (_React$Component) {
         height: barW,
         fill: COLOR_BAR_RMD_N
       });
+      svg.append('rect').attrs({
+        x: colorLegendXStart + colorLegendW * 2 + barW - 1,
+        y: colorLegendY,
+        width: barW,
+        height: barW,
+        fill: COLOR_BAR_RMD_L
+      });
       svg.append('text').text('Disappeared').attrs({
-        x: colorLegendXStart + colorLegendW * 2 + barW * 1.2,
+        x: colorLegendXStart + colorLegendW * 2 + barW * 2.2,
         y: colorLegendY + barW / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',

@@ -7,7 +7,8 @@
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
-    "npm": "^6.14.5"
+    "npm": "^6.14.5",
+    "pca-js": "^1.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
