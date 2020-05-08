@@ -99,8 +99,11 @@ class Util {
     return arr2d.map(row => row.map(val => (val - avg) / std));
   }
 
+  // 합계 
+  static sum = v => v.reduce((s, e) => s + e, 0);
+
   // 평균
-  static average = (v) => v.reduce((s, e) => s + e, 0) / v.length;
+  static average = v => Util.sum(v) / v.length;
 
   // 표준편차
   static standardDeviation (arr1d) {

@@ -205,6 +205,9 @@ var Util = function () {
       });
     }
 
+    // 합계 
+
+
     // 평균
 
   }, {
@@ -328,8 +331,12 @@ var Util = function () {
   return Util;
 }();
 
-Util.average = function (v) {
+Util.sum = function (v) {
   return v.reduce(function (s, e) {
     return s + e;
-  }, 0) / v.length;
+  }, 0);
+};
+
+Util.average = function (v) {
+  return Util.sum(v) / v.length;
 };

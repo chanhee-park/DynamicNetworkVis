@@ -11,7 +11,7 @@ var App = function () {
     this.data = new Dataset(testsets[1].url, testsets[1].idxs);
 
     // FIXME: 테스트 속도를 위하여 확률 값을 0.25로 하였음 => 1로 변경 필요.
-    this.network = Dataset.getNetwork(this.data, 0.1);
+    this.network = Dataset.getNetwork(this.data, 0.5);
 
     // React Visualization Objects
     this.visualizations = {
