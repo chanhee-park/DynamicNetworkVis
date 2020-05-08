@@ -111,7 +111,6 @@ const Util = {
  * from './dataset/copresence-InVS13/copresence-InVS13.edges'
  */
 function getTestData (testset) {
-  console.log(testset);
   const res = Util.loadFile(testset.url);
   const lines = res.split('\n');
 

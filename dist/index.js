@@ -10,7 +10,8 @@ var COLOR_NETWORK = COLOR_COM_NODE;
 var COLOR_AXIS = '#CCC';
 
 // my test network dataset
-var mynetwork = getTestData(Data.testset2);
+var mydata = new Dataset(testsets[0].url, testsets[0].idxs);
+var mynetwork = Dataset.getNetwork(mydata, 0.25);
 
 // visualizations on my app
 var visualizations = {

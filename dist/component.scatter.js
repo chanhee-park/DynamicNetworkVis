@@ -58,7 +58,6 @@ var ScatterPlot = function (_React$Component) {
       var pointPosXRatio = drawBoxMinLen / (data.maxX - data.minX);
       var pointPosYRatio = drawBoxMinLen / (data.maxY - data.minY);
       var maximumRadius = 20;
-      console.warn(data);
       var getPoint = function getPoint(pos, i) {
         return {
           x: (pos.x - data.minX) * pointPosXRatio + paddingLeft + graphPdding,

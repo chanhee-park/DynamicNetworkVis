@@ -180,7 +180,6 @@ var Util = {
    * from './dataset/copresence-InVS13/copresence-InVS13.edges'
    */
 };function getTestData(testset) {
-  console.log(testset);
   var res = Util.loadFile(testset.url);
   var lines = res.split('\n');
 

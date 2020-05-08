@@ -10,7 +10,8 @@ const COLOR_NETWORK = COLOR_COM_NODE;
 const COLOR_AXIS = '#CCC';
 
 // my test network dataset
-const mynetwork = getTestData(Data.testset2);
+const mydata = new Dataset(testsets[0].url, testsets[0].idxs);
+const mynetwork = Dataset.getNetwork(mydata, 0.25);
 
 // visualizations on my app
 const visualizations = {
