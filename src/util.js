@@ -62,14 +62,14 @@ const Util = {
   * @param {Set} post
   */
   compareSets: (pre, post) => {
-    const common = new Set();
+    const common = new Set(); // It will be a intersection of two sets.
     const preOnly = new Set();
     const postOnly = new Set();
 
     const union = new Set([...pre, ...post]); // Get Union of two sets.
     for (let e of union) {
       if (pre.has(e) && post.has(e)) {
-        common.add(e); // It is a intersection of two sets.
+        common.add(e);
       } else if (pre.has(e)) {
         preOnly.add(e);
       } else if (post.has(e)) {

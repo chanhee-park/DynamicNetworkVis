@@ -106,7 +106,7 @@ var Util = {
   * @param {Set} post
   */
   compareSets: function compareSets(pre, post) {
-    var common = new Set();
+    var common = new Set(); // It will be a intersection of two sets.
     var preOnly = new Set();
     var postOnly = new Set();
 
@@ -120,7 +120,7 @@ var Util = {
         var e = _step3.value;
 
         if (pre.has(e) && post.has(e)) {
-          common.add(e); // It is a intersection of two sets.
+          common.add(e);
         } else if (pre.has(e)) {
           preOnly.add(e);
         } else if (post.has(e)) {
