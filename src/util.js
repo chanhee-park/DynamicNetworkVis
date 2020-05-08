@@ -17,20 +17,25 @@ const Util = {
     return result;
   },
 
-  getSVG: (containerId) => {
-    const container = d3.select(containerId);
-    const containerBounding = container.node().getBoundingClientRect();
-    const svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
-    const svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
+  /**
+   * svg를 생성하고 리턴한다. 
+   * @param {string} selector 선택자 스트링 (eg. '#my_container')
+   */
+  getSVG: (selector) => {
+    const container = d3.select(selector);
+    const containerBBox = container.node().getBoundingClientRect();
+    const svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;
+    const svgH = containerBBox.height - 2 * PADDING_FOR_SECTION;
 
-    const svg = container
-      .append("svg")
+    return container.append("svg")
       .attr("width", svgW)
       .attr("height", svgH);
-
-    return svg;
   },
 
+  /**
+   * 최소 값을 찾는다. 
+   * @param {Iterable<number>} arrayLike 순회할 Iterable 객체 (eg. Array, Set, ..)
+   */
   min: (arrayLike) => {
     let min = +Infinity;
     for (let item of arrayLike) {
@@ -39,6 +44,10 @@ const Util = {
     return isFinite(min) ? min : -1
   },
 
+  /**
+  * 최대 값을 찾는다.
+  * @param {Iterable<number>} arrayLike 순회할 Iterable 객체 (eg. Array, Set, ..)
+  */
   max: (arrayLike) => {
     let max = -Infinity;
     for (let item of arrayLike) {
@@ -47,94 +56,67 @@ const Util = {
     return isFinite(max) ? max : -1
   },
 
+  /**
+  * 두개의 Set 객체를 비교한다.
+  * @param {Set} pre 
+  * @param {Set} post
+  */
   compareSets: (pre, post) => {
-    const union = new Set([...pre, ...post]);
-
     const common = new Set();
     const preOnly = new Set();
     const postOnly = new Set();
 
+    const union = new Set([...pre, ...post]); // Get Union of two sets.
     for (let e of union) {
       if (pre.has(e) && post.has(e)) {
-        common.add(e)
+        common.add(e); // It is a intersection of two sets.
       } else if (pre.has(e)) {
-        preOnly.add(e)
+        preOnly.add(e);
       } else if (post.has(e)) {
-        postOnly.add(e)
+        postOnly.add(e);
       }
     }
-
     return { preOnly, postOnly, common }
   },
 
+  /**
+   * PCA 차원축소
+   * @param {number[]} arr2d row에 instances, colunm에 attributes 값을 담는 2차원 배열
+   * @param {number} dimensions 기본 값이 2로 설정된 축소하여 반환할 차원의 수
+   */
   pca: (arr2d, dimensions = 2) => {
-    const pcaVal = PCA.getEigenVectors(arr2d);
-    const ret = [];
-    _.forEach(pcaVal, (v) => {
-      const val = [];
-      for (let i = 0; i < dimensions; i++) {
-        val.push(v.vector[i]);
-      }
-      ret.push(val);
-    });
-
-    return ret;
+    // package: https://cdn.jsdelivr.net/npm/pca-js@1.0.0/pca.min.js
+    const pcaRes = PCA.getEigenVectors(arr2d);
+    return pcaRes.map(e => e.vector.slice(0, dimensions))
   },
 
+  /**
+   * MDS 차원축소
+   * @param {number[]} distances 2차원 인접행렬
+   * @param {number} dimensions 기본 값이 2로 설정된 축소하여 반환할 차원의 수
+   */
   mds: (distances, dimensions = 2) => {
     // square distances
-    var M = numeric.mul(-.5, numeric.pow(distances, 2));
+    const M = numeric.mul(-.5, numeric.pow(distances, 2));
 
     // double centre the rows/columns
     function mean (A) { return numeric.div(numeric.add.apply(null, A), A.length); }
-    var rowMeans = mean(M),
+    const rowMeans = mean(M),
       colMeans = mean(numeric.transpose(M)),
       totalMean = mean(rowMeans);
 
-    for (var i = 0; i < M.length; ++i) {
-      for (var j = 0; j < M[0].length; ++j) {
+    for (let i = 0; i < M.length; ++i) {
+      for (let j = 0; j < M[0].length; ++j) {
         M[i][j] += totalMean - rowMeans[i] - colMeans[j];
       }
     }
 
     // take the SVD of the double centred matrix, and return the points from it
-    var ret = numeric.svd(M),
+    const ret = numeric.svd(M),
       eigenValues = numeric.sqrt(ret.S);
+
     return ret.U.map(function (row) {
       return numeric.mul(row, eigenValues).splice(0, dimensions);
     });
   },
-}
-
-/**
- * 테스트 데이터를 불러온다.
- * from './dataset/copresence-InVS13/copresence-InVS13.edges'
- */
-function getTestData (testset) {
-  const res = Util.loadFile(testset.url);
-  const lines = res.split('\n');
-
-  let nodes = new Set();;
-  let links = new Set();;
-  let times = new Set();;
-
-  _.forEach(lines, line => {
-    let elems = line.split(' ');
-
-    if (elems[testset.n1idx].length > 0 &&
-      elems[testset.n2idx].length > 0 &&
-      elems[testset.tidx].length > 0 &&
-      Math.random() > 0.9) {
-
-      const from = parseInt(elems[testset.n1idx]);
-      const to = parseInt(elems[testset.n2idx]);
-      const time = parseInt(elems[testset.tidx]);
-
-      nodes.add(from).add(to);
-      times.add(time);
-      links.add(new Link(from, to, time));
-    }
-  });
-
-  return new Network(nodes, links, times);
 }

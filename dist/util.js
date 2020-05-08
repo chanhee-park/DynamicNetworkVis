@@ -19,17 +19,23 @@ var Util = {
     return result;
   },
 
-  getSVG: function getSVG(containerId) {
-    var container = d3.select(containerId);
-    var containerBounding = container.node().getBoundingClientRect();
-    var svgW = containerBounding.width - 2 * PADDING_FOR_SECTION;
-    var svgH = containerBounding.height - 2 * PADDING_FOR_SECTION;
+  /**
+   * svg를 생성하고 리턴한다. 
+   * @param {string} selector 선택자 스트링 (eg. '#my_container')
+   */
+  getSVG: function getSVG(selector) {
+    var container = d3.select(selector);
+    var containerBBox = container.node().getBoundingClientRect();
+    var svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;
+    var svgH = containerBBox.height - 2 * PADDING_FOR_SECTION;
 
-    var svg = container.append("svg").attr("width", svgW).attr("height", svgH);
-
-    return svg;
+    return container.append("svg").attr("width", svgW).attr("height", svgH);
   },
 
+  /**
+   * 최소 값을 찾는다. 
+   * @param {Iterable<number>} arrayLike 순회할 Iterable 객체 (eg. Array, Set, ..)
+   */
   min: function min(arrayLike) {
     var min = +Infinity;
     var _iteratorNormalCompletion = true;
@@ -60,6 +66,10 @@ var Util = {
     return isFinite(min) ? min : -1;
   },
 
+  /**
+  * 최대 값을 찾는다.
+  * @param {Iterable<number>} arrayLike 순회할 Iterable 객체 (eg. Array, Set, ..)
+  */
   max: function max(arrayLike) {
     var max = -Infinity;
     var _iteratorNormalCompletion2 = true;
@@ -90,13 +100,17 @@ var Util = {
     return isFinite(max) ? max : -1;
   },
 
+  /**
+  * 두개의 Set 객체를 비교한다.
+  * @param {Set} pre 
+  * @param {Set} post
+  */
   compareSets: function compareSets(pre, post) {
-    var union = new Set([].concat(_toConsumableArray(pre), _toConsumableArray(post)));
-
     var common = new Set();
     var preOnly = new Set();
     var postOnly = new Set();
 
+    var union = new Set([].concat(_toConsumableArray(pre), _toConsumableArray(post))); // Get Union of two sets.
     var _iteratorNormalCompletion3 = true;
     var _didIteratorError3 = false;
     var _iteratorError3 = undefined;
@@ -106,7 +120,7 @@ var Util = {
         var e = _step3.value;
 
         if (pre.has(e) && post.has(e)) {
-          common.add(e);
+          common.add(e); // It is a intersection of two sets.
         } else if (pre.has(e)) {
           preOnly.add(e);
         } else if (post.has(e)) {
@@ -131,22 +145,26 @@ var Util = {
     return { preOnly: preOnly, postOnly: postOnly, common: common };
   },
 
+  /**
+   * PCA 차원축소
+   * @param {number[]} arr2d row에 instances, colunm에 attributes 값을 담는 2차원 배열
+   * @param {number} dimensions 기본 값이 2로 설정된 축소하여 반환할 차원의 수
+   */
   pca: function pca(arr2d) {
     var dimensions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
-    var pcaVal = PCA.getEigenVectors(arr2d);
-    var ret = [];
-    _.forEach(pcaVal, function (v) {
-      var val = [];
-      for (var i = 0; i < dimensions; i++) {
-        val.push(v.vector[i]);
-      }
-      ret.push(val);
+    // package: https://cdn.jsdelivr.net/npm/pca-js@1.0.0/pca.min.js
+    var pcaRes = PCA.getEigenVectors(arr2d);
+    return pcaRes.map(function (e) {
+      return e.vector.slice(0, dimensions);
     });
-
-    return ret;
   },
 
+  /**
+   * MDS 차원축소
+   * @param {number[]} distances 2차원 인접행렬
+   * @param {number} dimensions 기본 값이 2로 설정된 축소하여 반환할 차원의 수
+   */
   mds: function mds(distances) {
     var dimensions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
@@ -170,37 +188,9 @@ var Util = {
     // take the SVD of the double centred matrix, and return the points from it
     var ret = numeric.svd(M),
         eigenValues = numeric.sqrt(ret.S);
+
     return ret.U.map(function (row) {
       return numeric.mul(row, eigenValues).splice(0, dimensions);
     });
   }
-
-  /**
-   * 테스트 데이터를 불러온다.
-   * from './dataset/copresence-InVS13/copresence-InVS13.edges'
-   */
-};function getTestData(testset) {
-  var res = Util.loadFile(testset.url);
-  var lines = res.split('\n');
-
-  var nodes = new Set();;
-  var links = new Set();;
-  var times = new Set();;
-
-  _.forEach(lines, function (line) {
-    var elems = line.split(' ');
-
-    if (elems[testset.n1idx].length > 0 && elems[testset.n2idx].length > 0 && elems[testset.tidx].length > 0 && Math.random() > 0.9) {
-
-      var from = parseInt(elems[testset.n1idx]);
-      var to = parseInt(elems[testset.n2idx]);
-      var time = parseInt(elems[testset.tidx]);
-
-      nodes.add(from).add(to);
-      times.add(time);
-      links.add(new Link(from, to, time));
-    }
-  });
-
-  return new Network(nodes, links, times);
-}
+};
