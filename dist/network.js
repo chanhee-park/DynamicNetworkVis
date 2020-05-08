@@ -11,23 +11,16 @@ var Network = function () {
     this.typeInfo = typeof typeInfo !== 'undefined' ? typeInfo : Network.typeTotal();
     this.nodes = typeof nodes !== 'undefined' ? nodes : new Set();
     this.links = typeof links !== 'undefined' ? links : new Set();
-    this.times = typeof times !== 'undefined' ? times : this.setTimes();
-    this.timeFirst = Util.min(this.times);
-    this.timeLast = Util.max(this.times);
+    this.times = typeof times !== 'undefined' ? times : new Set();
 
-    this.subNetworks = undefined;
-    this.compareInfo = undefined;
-    this.subNetDistances = undefined;
-    this.emptySubNets = undefined;
-    if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
+    if (Network.isTotal(this) && !Network.isEmpty(this)) {
+      // 비어있지 않은 Total Network에만 적용
       this.subNetworks = Network.splitByTime(this);
-      this.emptySubNets = Network.getEmptyNetworksIdx(this.subNetworks);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
-      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.emptySubNets);
-    } else {
-      this.timeFirst = this.typeInfo.first;
-      this.timeLast = this.typeInfo.last;
-      this.timeAvg = this.typeInfo.avg;
+      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough');
+    } else if (this.typeInfo.type != Network.typeTotal().type) {
+      // Sub Netwokr에만 적용
+      this.timeAvg = this.typeInfo.timeAvg;
     }
   }
 
@@ -38,39 +31,32 @@ var Network = function () {
         type: this.typeInfo.type,
         nodes: this.nodes,
         links: this.links,
-        timezone: [this.timeFirst, this.timeLast, this.times],
+        times: this.times,
         subs: this.subNetworks
       });
     }
-
-    // links로 부터 times를 지정한다. 
-
-  }, {
-    key: 'setTimes',
-    value: function setTimes() {
-      var _this = this;
-
-      this.times = new Set();
-      _.forEach(this.links, function (l) {
-        _this.times.add(l.time);
-      });
-      return this.times;
-    }
   }], [{
+    key: 'isEmpty',
+    value: function isEmpty(network) {
+      return network.nodes.size === 0 && network.links.size === 0;
+    }
+  }, {
+    key: 'isTotal',
+    value: function isTotal(network) {
+      return network.typeInfo.type == Network.typeTotal().type;
+    }
+  }, {
     key: 'typeTotal',
     value: function typeTotal() {
-      return { type: 'TOTAL', numberOfSplits: 20 };
+      return { type: 'TOTAL' };
     }
   }, {
     key: 'typeSub',
-    value: function typeSub(idx, numberOfSplits, first, last) {
+    value: function typeSub(idx, timeAvg) {
       return {
         type: 'SUB',
         idx: idx,
-        numberOfSplits: numberOfSplits,
-        first: first,
-        last: last,
-        avg: (first + last) / 2
+        timeAvg: timeAvg
       };
     }
   }, {
@@ -78,13 +64,14 @@ var Network = function () {
     value: function splitByTime(network) {
       var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 39;
 
-      network.typeInfo.numberOfSplits = numberOfSplits;
-
-      // get Time Interval
-      var timeDiff = network.timeLast - network.timeFirst + 0.0001;
+      // Get Time Interval
+      var timeFirstAndLast = Util.minmax(network.times);
+      var timeFirst = timeFirstAndLast[0];
+      var timeLast = timeFirstAndLast[1];
+      var timeDiff = timeLast - timeFirst + 0.00001;
       var timeInterval = timeDiff / numberOfSplits;
 
-      // get splited nodes, links, times
+      // Split nodes, links, and times
       var spNodes = [].concat(_toConsumableArray(Array(numberOfSplits))).map(function (e) {
         return new Set();
       });
@@ -94,7 +81,6 @@ var Network = function () {
       var spTimes = [].concat(_toConsumableArray(Array(numberOfSplits))).map(function (e) {
         return new Set();
       });
-
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
@@ -103,14 +89,13 @@ var Network = function () {
         for (var _iterator = network.links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var link = _step.value;
 
-          var timeIdx = parseInt((link.time - network.timeFirst) / timeInterval);
-          spNodes[timeIdx].add(link.from);
-          spNodes[timeIdx].add(link.to);
+          var timeIdx = parseInt((link.time - timeFirst) / timeInterval);
+          spNodes[timeIdx].add(link.from).add(link.to);
           spLinks[timeIdx].add(link);
           spTimes[timeIdx].add(link.time);
         }
 
-        // get splited networks
+        // Merge splited nodes, links, and times as splited networks  
       } catch (err) {
         _didIteratorError = true;
         _iteratorError = err;
@@ -128,7 +113,10 @@ var Network = function () {
 
       var spNetworks = [Array(numberOfSplits), undefined];
       for (var idx = 0; idx < numberOfSplits; idx++) {
-        spNetworks[idx] = new Network(spNodes[idx], spLinks[idx], spTimes[idx], Network.typeSub(idx, numberOfSplits, timeInterval * (idx + 0) + network.timeFirst, timeInterval * (idx + 1) + network.timeFirst));
+        var subTimeFirst = timeInterval * (idx + 0) + timeFirst;
+        var subTimeLast = timeInterval * (idx + 1) + timeFirst;
+        var subTimeAvg = (subTimeFirst + subTimeLast) / 2;
+        spNetworks[idx] = new Network(spNodes[idx], spLinks[idx], spTimes[idx], Network.typeSub(idx, subTimeAvg));
       }
 
       // assign and return
@@ -136,34 +124,32 @@ var Network = function () {
       return network.subNetworks;
     }
   }, {
-    key: 'getEmptyNetworksIdx',
-    value: function getEmptyNetworksIdx(networks) {
-      ret = [];
-      _.forEach(networks, function (n, i) {
-        if (n.nodes.size == 0) {
-          ret.push(i);
-        }
-      });
-      return ret;
-    }
-  }, {
     key: 'getDistances',
-    value: function getDistances(compareInfo, similarityCriteria, emptyIdxs) {
+    value: function getDistances(compareInfo, similarityCriteria) {
       var N = compareInfo.length;
       var ret = [].concat(_toConsumableArray(Array(N))).map(function (x) {
         return Array(N).fill(0);
       });
-      for (var i = 0; i < compareInfo.length; i++) {
-        ret[i][i] = 0;
-        for (var j = i + 1; j < compareInfo.length; j++) {
-          if (j in emptyIdxs) continue;
+      for (var i = 0; i < N; i++) {
+        for (var j = i + 1; j < N; j++) {
           var similarity = compareInfo[i][j].similarity[similarityCriteria];
           var disimilarity = 1 - similarity;
-          ret[j][j] = disimilarity;
+          ret[i][j] = disimilarity;
           ret[j][i] = disimilarity;
         }
+
+        /*
+         * ret[i][i] = 0 이면, 이상치 혼자 너무 작아서 스캐터 플롯이 잘 안그려진다.
+         * 따라서, 해당 행의 평균값을 값으로 사용한다. 
+         */
+        ret[i][i] = 0;
+        var summ = ret[i].reduce(function (a, b) {
+          return a + b;
+        }, 0);
+        ret[i][i] = summ / (N - 1);
       }
-      return ret;
+
+      return Util.normalize2d(ret);
     }
   }, {
     key: 'compareSeveral',
@@ -174,7 +160,7 @@ var Network = function () {
       });
       for (var i = 0; i < N; i++) {
         for (var j = i + 1; j < N; j++) {
-          ret[i][j] = this.compare(networks[i], networks[j]);
+          ret[i][j] = Network.compare(networks[i], networks[j]);
         }
       }
       return ret;
@@ -196,10 +182,16 @@ var Network = function () {
       var roughN = (sizes.nc + 1) / (sizes.nc + sizes.n1 + sizes.n2 + 1);
       var roughL = (sizes.lc + 1) / (sizes.lc + sizes.l1 + sizes.l2 + 1);
       var similarity = {
-        rough: 0.75 * roughN + 0.25 * roughL
-      };
+        roughNode: roughN,
+        roughLink: roughL,
+        rough: Math.sqrt(roughN * roughL) // 기하평균 ( 0 <= value <= 1 )
 
-      return { nodes: nodes, links: links, similarity: similarity };
+        // console.log('---')
+        // console.log(nodes, roughN.toPrecision(3));
+        // console.log(links, roughL.toPrecision(3));
+        // console.warn(similarity.rough.toPrecision(3));
+
+      };return { nodes: nodes, links: links, similarity: similarity };
     }
   }, {
     key: 'compareNodes',

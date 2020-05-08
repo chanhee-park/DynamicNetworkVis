@@ -63,7 +63,6 @@ var Dataset = function () {
       var nodes = new Set();
       var links = new Set();
       var times = new Set();
-
       var lines = txt.split('\n');
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -73,13 +72,17 @@ var Dataset = function () {
         for (var _iterator = lines[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var line = _step.value;
 
-          if (Math.random() > probability) {
-            continue;
-          }
+          // probability 확률로 링크를 필터링 합니다.
+          if (Math.random() > probability) continue;
+
           var elems = line.split(sep);
           var from = parseInt(elems[n1Idx]);
           var to = parseInt(elems[n2Idx]);
           var time = parseInt(elems[tiIdx]);
+
+          // from_node, to_node, 그리고 time 중 하나라도 NaN인 경우 패스합니다.
+          if (isNaN(from + to + time)) continue;
+
           nodes.add(from).add(to);
           times.add(time);
           links.add(new Link(from, to, time));

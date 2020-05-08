@@ -44,19 +44,22 @@ class Dataset {
     const n2Idx = dataset.node2Idx;
     const tiIdx = dataset.timeIdx;
 
-    let nodes = new Set();
-    let links = new Set();
-    let times = new Set();
-
+    const nodes = new Set();
+    const links = new Set();
+    const times = new Set();
     const lines = txt.split('\n');
     for (let line of lines) {
-      if (Math.random() > probability) {
-        continue;
-      }
-      let elems = line.split(sep);
+      // probability 확률로 링크를 필터링 합니다.
+      if (Math.random() > probability) continue;
+
+      const elems = line.split(sep);
       const from = parseInt(elems[n1Idx]);
       const to = parseInt(elems[n2Idx]);
       const time = parseInt(elems[tiIdx]);
+
+      // from_node, to_node, 그리고 time 중 하나라도 NaN인 경우 패스합니다.
+      if (isNaN(from + to + time)) continue;
+
       nodes.add(from).add(to);
       times.add(time);
       links.add(new Link(from, to, time));

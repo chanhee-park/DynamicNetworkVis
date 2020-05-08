@@ -272,7 +272,6 @@ var Timeline = function (_React$Component) {
     key: 'getTimelineInfo',
     value: function getTimelineInfo(totalNetwork) {
       var subNetworks = totalNetwork.subNetworks;
-
       var ret = [Network.compare(new Network(), subNetworks[0])];
       var sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
       var avgTimes = [subNetworks[0].timeAvg];

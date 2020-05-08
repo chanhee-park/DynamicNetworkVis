@@ -273,7 +273,6 @@ class Timeline extends React.Component {
 
   getTimelineInfo (totalNetwork) {
     const subNetworks = totalNetwork.subNetworks;
-
     const ret = [Network.compare(new Network(), subNetworks[0])];
     const sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];
     const avgTimes = [subNetworks[0].timeAvg];

@@ -3,23 +3,16 @@ class Network {
     this.typeInfo = typeof typeInfo !== 'undefined' ? typeInfo : Network.typeTotal();
     this.nodes = typeof nodes !== 'undefined' ? nodes : new Set();
     this.links = typeof links !== 'undefined' ? links : new Set();
-    this.times = typeof times !== 'undefined' ? times : this.setTimes();
-    this.timeFirst = Util.min(this.times);
-    this.timeLast = Util.max(this.times);
+    this.times = typeof times !== 'undefined' ? times : new Set();
 
-    this.subNetworks = undefined;
-    this.compareInfo = undefined;
-    this.subNetDistances = undefined;
-    this.emptySubNets = undefined;
-    if (this.typeInfo.type == Network.typeTotal().type && this.nodes.size > 0) {
+    if (Network.isTotal(this) && !Network.isEmpty(this)) {
+      // 비어있지 않은 Total Network에만 적용
       this.subNetworks = Network.splitByTime(this);
-      this.emptySubNets = Network.getEmptyNetworksIdx(this.subNetworks);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
-      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.emptySubNets);
-    } else {
-      this.timeFirst = this.typeInfo.first;
-      this.timeLast = this.typeInfo.last;
-      this.timeAvg = this.typeInfo.avg;
+      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough');
+    } else if (this.typeInfo.type != Network.typeTotal().type) {
+      // Sub Netwokr에만 적용
+      this.timeAvg = this.typeInfo.timeAvg;
     }
   }
 
@@ -28,69 +21,61 @@ class Network {
       type: this.typeInfo.type,
       nodes: this.nodes,
       links: this.links,
-      timezone: [this.timeFirst, this.timeLast, this.times],
+      times: this.times,
       subs: this.subNetworks
     });
   }
 
-  // links로 부터 times를 지정한다. 
-  setTimes () {
-    this.times = new Set()
-    _.forEach(this.links, (l) => {
-      this.times.add(l.time);
-    });
-    return this.times;
+  static isEmpty (network) {
+    return network.nodes.size === 0 && network.links.size === 0;
+  }
+
+  static isTotal (network) {
+    return network.typeInfo.type == Network.typeTotal().type;
   }
 
   static typeTotal () {
-    return { type: 'TOTAL', numberOfSplits: 20 }
+    return { type: 'TOTAL' }
   }
 
-  static typeSub (idx, numberOfSplits, first, last) {
+  static typeSub (idx, timeAvg) {
     return {
       type: 'SUB',
       idx: idx,
-      numberOfSplits: numberOfSplits,
-      first: first,
-      last: last,
-      avg: (first + last) / 2
+      timeAvg: timeAvg
     }
   }
 
   static splitByTime (network, numberOfSplits = 39) {
-    network.typeInfo.numberOfSplits = numberOfSplits;
-
-    // get Time Interval
-    const timeDiff = network.timeLast - network.timeFirst + 0.0001;
+    // Get Time Interval
+    const timeFirstAndLast = Util.minmax(network.times);
+    const timeFirst = timeFirstAndLast[0];
+    const timeLast = timeFirstAndLast[1];
+    const timeDiff = timeLast - timeFirst + 0.00001;
     const timeInterval = timeDiff / numberOfSplits;
 
-
-    // get splited nodes, links, times
+    // Split nodes, links, and times
     const spNodes = [...Array(numberOfSplits)].map(e => new Set());
     const spLinks = [...Array(numberOfSplits)].map(e => new Set());
     const spTimes = [...Array(numberOfSplits)].map(e => new Set());
-
     for (let link of network.links) {
-      const timeIdx = parseInt((link.time - network.timeFirst) / timeInterval);
-      spNodes[timeIdx].add(link.from);
-      spNodes[timeIdx].add(link.to);
+      const timeIdx = parseInt((link.time - timeFirst) / timeInterval);
+      spNodes[timeIdx].add(link.from).add(link.to);
       spLinks[timeIdx].add(link);
       spTimes[timeIdx].add(link.time);
     }
 
-    // get splited networks
+    // Merge splited nodes, links, and times as splited networks  
     const spNetworks = [Array(numberOfSplits), undefined];
     for (let idx = 0; idx < numberOfSplits; idx++) {
+      const subTimeFirst = timeInterval * (idx + 0) + timeFirst;
+      const subTimeLast = timeInterval * (idx + 1) + timeFirst;
+      const subTimeAvg = (subTimeFirst + subTimeLast) / 2;
       spNetworks[idx] = new Network(
         spNodes[idx],
         spLinks[idx],
         spTimes[idx],
-        Network.typeSub(
-          idx,
-          numberOfSplits,
-          timeInterval * (idx + 0) + network.timeFirst,
-          timeInterval * (idx + 1) + network.timeFirst,
-        )
+        Network.typeSub(idx, subTimeAvg)
       );
     }
 
@@ -99,30 +84,27 @@ class Network {
     return network.subNetworks;
   }
 
-  static getEmptyNetworksIdx (networks) {
-    ret = [];
-    _.forEach(networks, (n, i) => {
-      if (n.nodes.size == 0) {
-        ret.push(i);
-      }
-    });
-    return ret;
-  }
-
-  static getDistances (compareInfo, similarityCriteria, emptyIdxs) {
+  static getDistances (compareInfo, similarityCriteria) {
     const N = compareInfo.length;
     const ret = [...Array(N)].map(x => Array(N).fill(0));
-    for (let i = 0; i < compareInfo.length; i++) {
-      ret[i][i] = 0;
-      for (let j = i + 1; j < compareInfo.length; j++) {
-        if (j in emptyIdxs) continue;
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
         const similarity = compareInfo[i][j].similarity[similarityCriteria];
         const disimilarity = (1 - similarity);
-        ret[j][j] = disimilarity;
+        ret[i][j] = disimilarity;
         ret[j][i] = disimilarity;
       }
+
+      /*
+       * ret[i][i] = 0 이면, 이상치 혼자 너무 작아서 스캐터 플롯이 잘 안그려진다.
+       * 따라서, 해당 행의 평균값을 값으로 사용한다. 
+       */
+      ret[i][i] = 0;
+      let summ = ret[i].reduce((a, b) => a + b, 0);
+      ret[i][i] = summ / (N - 1);
     }
-    return ret;
+
+    return Util.normalize2d(ret);
   }
 
   static compareSeveral (networks) {
@@ -130,7 +112,7 @@ class Network {
     const ret = [...Array(N)].map(x => Array(N).fill(0));
     for (let i = 0; i < N; i++) {
       for (let j = i + 1; j < N; j++) {
-        ret[i][j] = this.compare(networks[i], networks[j]);
+        ret[i][j] = Network.compare(networks[i], networks[j]);
       }
     }
     return ret;
@@ -151,8 +133,14 @@ class Network {
     const roughN = (sizes.nc + 1) / (sizes.nc + sizes.n1 + sizes.n2 + 1);
     const roughL = (sizes.lc + 1) / (sizes.lc + sizes.l1 + sizes.l2 + 1);
     const similarity = {
-      rough: 0.75 * roughN + 0.25 * roughL,
+      roughNode: roughN,
+      roughLink: roughL,
+      rough: Math.sqrt(roughN * roughL), // 기하평균 ( 0 <= value <= 1 )
     }
+    // console.log('---')
+    // console.log(nodes, roughN.toPrecision(3));
+    // console.log(links, roughL.toPrecision(3));
+    // console.warn(similarity.rough.toPrecision(3));
 
     return { nodes, links, similarity };
   }
