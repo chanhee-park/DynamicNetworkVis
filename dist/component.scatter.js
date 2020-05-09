@@ -20,7 +20,7 @@ var ScatterPlot = function (_React$Component) {
     _this.distances = _this.props.network.subNetDistances.matrix;
     _this.networkIdxs = _this.props.network.subNetDistances.idxs;
     _this.networks = _this.props.network.subNetworks;
-    _this.points = ScatterPlot.getScatterData(_this.distances, _this.networks);
+    _this.points = ScatterPlot.getScatterData(_this.distances, _this.networks, _this.networkIdxs);
     _this.points.normalize();
     return _this;
   }
@@ -52,32 +52,8 @@ var ScatterPlot = function (_React$Component) {
       // set scatter plot graph size
       var drawBoxW = svgW - paddingGraph * 2;
       var drawBoxH = svgH - paddingGraph * 2;
-      var minRadius = 10;
-      var maxRadius = 25;
-
-      // Define position, size, and color of  circles on the scatter plot 
-      var getCircle = function getCircle(p) {
-        return {
-          cx: paddingGraph + drawBoxW * p.x,
-          cy: paddingGraph + drawBoxH * p.y,
-          r: p.r * (maxRadius - minRadius) + minRadius,
-          fill: p.c,
-          opacity: p.a
-        };
-      };
-
-      // draw circles on the scatter plot
-      normPoints.pointArr.forEach(function (p, i) {
-        var attrs = getCircle(p);
-        svg.append('circle').attrs(attrs);
-        svg.append('text').text(networkIdxs[i]).attrs({
-          x: attrs.cx,
-          y: attrs.cy,
-          'text-anchor': 'middle',
-          'alignment-baseline': 'middle',
-          fill: '#333'
-        });
-      });
+      var minRadius = 5;
+      var maxRadius = 10;
 
       // Draw Axis and Legend
       var numberOfAxis = 5;
@@ -101,8 +77,30 @@ var ScatterPlot = function (_React$Component) {
           stroke: COLOR_AXIS
         });
       }
-      // 가로 선 
 
+      // Define position, size, and color of  circles on the scatter plot 
+      var getCircle = function getCircle(p) {
+        return {
+          cx: paddingGraph + drawBoxW * p.x,
+          cy: paddingGraph + drawBoxH * p.y,
+          r: p.r * (maxRadius - minRadius) + minRadius,
+          fill: p.c,
+          opacity: p.a
+        };
+      };
+
+      // draw circles on the scatter plot
+      normPoints.pointArr.forEach(function (p, i) {
+        var attrs = getCircle(p);
+        svg.append('circle').attrs(attrs);
+        // svg.append('text').text(networkIdxs[i]).attrs({
+        //   x: attrs.cx,
+        //   y: attrs.cy,
+        //   'text-anchor': 'middle',
+        //   'alignment-baseline': 'middle',
+        //   fill: '#333',
+        // });
+      });
 
       // TODO: 확대 축소 클릭 호버 인터랙션
 
@@ -110,7 +108,7 @@ var ScatterPlot = function (_React$Component) {
     }
   }, {
     key: 'getScatterData',
-    value: function getScatterData(distanceMatrix, networks) {
+    value: function getScatterData(distanceMatrix, networks, networkIdxs) {
       // const vector = Util.pca(distanceMatrix);
       var vector = Util.mds(distanceMatrix);
       var N = networks.length;
@@ -119,8 +117,9 @@ var ScatterPlot = function (_React$Component) {
           x: v[0],
           y: v[1],
           r: Math.sqrt(networks[i].nodes.size),
-          c: d3.interpolateGnBu((i + N / 4) / (N - 1 + N / 4)),
-          a: 0.5
+          c: d3.interpolateYlGnBu((networkIdxs[i] + 1 + N / 4) / (N + N / 4) // 0.25 ~ 1.00
+          ),
+          a: 0.75
         });
       });
 

@@ -26,9 +26,9 @@ class Timeline extends React.Component {
     const svgW = svgBBox.width;
     const svgH = svgBBox.height;
 
-    const paddingRight = 200;
-    const paddingTop = 50;
-    const paddingBottom = 20;
+    const paddingRight = 180;
+    const paddingTop = 40;
+    const paddingBottom = 25;
 
     const barInterval = (svgW - paddingRight) / (bars.length + 1);
     const barW = barInterval / 4;
@@ -39,15 +39,15 @@ class Timeline extends React.Component {
     const xEnd = svgW - paddingRight;
 
     // title
-    svg.append('text')
-      .text('Network Change Timeline')
-      .attrs({
-        x: 10,
-        y: 10,
-        'text-anchor': 'start',
-        'alignment-baseline': 'hanging',
-        'font-size': 18
-      });
+    // svg.append('text')
+    //   .text('Network Change Timeline')
+    //   .attrs({
+    //     x: 10,
+    //     y: 10,
+    //     'text-anchor': 'start',
+    //     'alignment-baseline': 'hanging',
+    //     'font-size': 18
+    //   });
 
     // Legend - colors
     const colorLegendW = 100;
@@ -58,22 +58,22 @@ class Timeline extends React.Component {
     svg.append('rect').attrs({
       x: colorLegendXStart,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_COM_NODE
     });
     svg.append('rect').attrs({
-      x: colorLegendXStart + barW - 1,
+      x: colorLegendXStart + 15 - 1,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_COM_LINK
     });
     svg.append('text')
       .text('Remained')
       .attrs({
-        x: colorLegendXStart + barW * 2.2,
-        y: colorLegendY + barW / 2,
+        x: colorLegendXStart + 15 * 2.2,
+        y: colorLegendY + 15 / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',
         'font-size': 14
@@ -83,22 +83,22 @@ class Timeline extends React.Component {
     svg.append('rect').attrs({
       x: colorLegendXStart + colorLegendW,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_ADD_NODE
     });
     svg.append('rect').attrs({
-      x: colorLegendXStart + colorLegendW + barW - 1,
+      x: colorLegendXStart + colorLegendW + 15 - 1,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_ADD_LINK
     });
     svg.append('text')
       .text('Added')
       .attrs({
-        x: colorLegendXStart + colorLegendW + barW * 2.2,
-        y: colorLegendY + barW / 2,
+        x: colorLegendXStart + colorLegendW + 15 * 2.2,
+        y: colorLegendY + 15 / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',
         'font-size': 14
@@ -108,22 +108,22 @@ class Timeline extends React.Component {
     svg.append('rect').attrs({
       x: colorLegendXStart + colorLegendW * 2,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_RMD_NODE
     });
     svg.append('rect').attrs({
-      x: colorLegendXStart + colorLegendW * 2 + barW - 1,
+      x: colorLegendXStart + colorLegendW * 2 + 15 - 1,
       y: colorLegendY,
-      width: barW,
-      height: barW,
+      width: 15,
+      height: 15,
       fill: COLOR_RMD_LINK
     });
     svg.append('text')
       .text('Disappeared')
       .attrs({
-        x: colorLegendXStart + colorLegendW * 2 + barW * 2.2,
-        y: colorLegendY + barW / 2,
+        x: colorLegendXStart + colorLegendW * 2 + 15 * 2.2,
+        y: colorLegendY + 15 / 2,
         'text-anchor': 'start',
         'alignment-baseline': 'central',
         'font-size': 14
@@ -206,13 +206,14 @@ class Timeline extends React.Component {
         const timeString = Math.round(avgTimes[i]);
         svg.append('text').text(timeString).attrs({
           x: x + barW,
-          y: svgH - paddingBottom + 5,
+          y: svgH - paddingBottom + 10,
           'text-anchor': 'middle',
           'alignment-baseline': 'hanging',
         });
       }
 
       // 바 그리기
+      // TODO: 노드 링크 높이 따로따로
       const values = [
         bar.nodes.preOnly.size,  // removed
         bar.nodes.postOnly.size, // added

@@ -63,7 +63,7 @@ var Network = function () {
   }, {
     key: 'splitByTime',
     value: function splitByTime(network) {
-      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 200;
 
       // Get Time Interval
       var timeFirstAndLast = Util.minmax(network.times);

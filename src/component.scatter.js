@@ -5,7 +5,8 @@ class ScatterPlot extends React.Component {
     this.distances = this.props.network.subNetDistances.matrix;
     this.networkIdxs = this.props.network.subNetDistances.idxs;
     this.networks = this.props.network.subNetworks;
-    this.points = ScatterPlot.getScatterData(this.distances, this.networks);
+    this.points = ScatterPlot.getScatterData(
+      this.distances, this.networks, this.networkIdxs);
     this.points.normalize();
   }
 
@@ -27,32 +28,8 @@ class ScatterPlot extends React.Component {
     // set scatter plot graph size
     const drawBoxW = svgW - paddingGraph * 2;
     const drawBoxH = svgH - paddingGraph * 2;
-    const minRadius = 10;
-    const maxRadius = 25;
-
-    // Define position, size, and color of  circles on the scatter plot 
-    const getCircle = p => {
-      return {
-        cx: paddingGraph + (drawBoxW * p.x),
-        cy: paddingGraph + (drawBoxH * p.y),
-        r: p.r * (maxRadius - minRadius) + minRadius,
-        fill: p.c,
-        opacity: p.a,
-      }
-    }
-
-    // draw circles on the scatter plot
-    normPoints.pointArr.forEach((p, i) => {
-      const attrs = getCircle(p)
-      svg.append('circle').attrs(attrs);
-      svg.append('text').text(networkIdxs[i]).attrs({
-        x: attrs.cx,
-        y: attrs.cy,
-        'text-anchor': 'middle',
-        'alignment-baseline': 'middle',
-        fill: '#333',
-      });
-    });
+    const minRadius = 5;
+    const maxRadius = 10;
 
     // Draw Axis and Legend
     const numberOfAxis = 5;
@@ -76,15 +53,37 @@ class ScatterPlot extends React.Component {
         stroke: COLOR_AXIS
       });
     }
-    // 가로 선 
 
+    // Define position, size, and color of  circles on the scatter plot 
+    const getCircle = p => {
+      return {
+        cx: paddingGraph + (drawBoxW * p.x),
+        cy: paddingGraph + (drawBoxH * p.y),
+        r: p.r * (maxRadius - minRadius) + minRadius,
+        fill: p.c,
+        opacity: p.a,
+      }
+    }
+
+    // draw circles on the scatter plot
+    normPoints.pointArr.forEach((p, i) => {
+      const attrs = getCircle(p)
+      svg.append('circle').attrs(attrs);
+      // svg.append('text').text(networkIdxs[i]).attrs({
+      //   x: attrs.cx,
+      //   y: attrs.cy,
+      //   'text-anchor': 'middle',
+      //   'alignment-baseline': 'middle',
+      //   fill: '#333',
+      // });
+    });
 
     // TODO: 확대 축소 클릭 호버 인터랙션
 
     return;
   }
 
-  static getScatterData (distanceMatrix, networks) {
+  static getScatterData (distanceMatrix, networks, networkIdxs) {
     // const vector = Util.pca(distanceMatrix);
     const vector = Util.mds(distanceMatrix);
     const N = networks.length;
@@ -92,8 +91,10 @@ class ScatterPlot extends React.Component {
       x: v[0],
       y: v[1],
       r: Math.sqrt(networks[i].nodes.size),
-      c: d3.interpolateGnBu((i + N / 4) / (N - 1 + N / 4)),
-      a: 0.5
+      c: d3.interpolateYlGnBu(
+        (networkIdxs[i] + 1 + N / 4) / (N + N / 4) // 0.25 ~ 1.00
+      ),
+      a: 0.75
     }));
 
     return new Points(pointArr);

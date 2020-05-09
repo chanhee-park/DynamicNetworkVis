@@ -47,7 +47,7 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 100) {
+  static splitByTime (network, numberOfSplits = 200) {
     // Get Time Interval
     const timeFirstAndLast = Util.minmax(network.times);
     const timeFirst = timeFirstAndLast[0];
