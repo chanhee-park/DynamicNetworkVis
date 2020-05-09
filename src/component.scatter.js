@@ -5,6 +5,7 @@ class ScatterPlot extends React.Component {
     this.distances = this.props.network.subNetDistances;
     this.networks = this.props.network.subNetworks;
     this.points = ScatterPlot.getScatterData(this.distances, this.networks);
+    this.points.normalize();
   }
 
   componentDidMount () {
@@ -33,17 +34,12 @@ class ScatterPlot extends React.Component {
       drawBoxH = svgH - paddingTop - paddingBottom,
       maximumRadius = 25;
 
-    // define sizing variable for circles on the scatter plot.
-    const pointPosXRatio = drawBoxW / (points.maxX - points.minX);
-    const pointPosYRatio = drawBoxH / (points.maxY - points.minY);
-    const pointRadiusRatio = maximumRadius / points.maxR;
-
     // Define position, size, and color of  circles on the scatter plot 
-    const getCircle = (p) => {
+    const getCircle = p => {
       return {
-        cx: (p.x - points.minX) * pointPosXRatio + paddingLeft + graphPdding,
-        cy: (p.y - points.minY) * pointPosYRatio + paddingTop + graphPdding,
-        r: p.r * pointRadiusRatio,
+        cx: p.x * drawBoxW + paddingLeft + graphPdding,
+        cy: p.y * drawBoxH + paddingTop + graphPdding,
+        r: p.r * maximumRadius,
         fill: p.c,
         opacity: p.a,
       }
@@ -70,22 +66,18 @@ class ScatterPlot extends React.Component {
   }
 
   static getScatterData (distanceMatrix, networks) {
-    const N = networks.length;
-
-    // const vector = Util.pca(subNetDistances);
+    // const vector = Util.pca(distanceMatrix);
     const vector = Util.mds(distanceMatrix);
-    const points = new Points();
-    vector.forEach((v, i) => {
-      points.add(new Point({
-        x: v[0],
-        y: v[1],
-        r: Math.sqrt(networks[i].nodes.size),
-        c: d3.interpolateGnBu((i + N / 4) / (N - 1 + N / 4)),
-        a: 0.5
-      }));
-    });
+    const N = networks.length;
+    const pointArr = vector.map((v, i) => new Point({
+      x: v[0],
+      y: v[1],
+      r: Math.sqrt(networks[i].nodes.size),
+      c: d3.interpolateGnBu((i + N / 4) / (N - 1 + N / 4)),
+      a: 0.5
+    }));
 
-    return points;
+    return new Points(pointArr);
   }
 
   render () {
@@ -97,12 +89,12 @@ class Points {
   constructor(pointArr) {
     const isEmpty = typeof pointArr !== 'undefined';
     this.pointArr = isEmpty ? pointArr : [];
-    this.minX = isEmpty ? _.minBy(pointArr, 'x') : +Infinity;
-    this.maxX = isEmpty ? _.maxBy(pointArr, 'x') : -Infinity;
-    this.minY = isEmpty ? _.minBy(pointArr, 'y') : +Infinity;
-    this.maxY = isEmpty ? _.maxBy(pointArr, 'y') : -Infinity;
-    this.minR = isEmpty ? _.minBy(pointArr, 'r') : +Infinity;
-    this.maxR = isEmpty ? _.maxBy(pointArr, 'r') : 0;
+    this.minX = isEmpty ? _.minBy(pointArr, 'x').x : +Infinity;
+    this.maxX = isEmpty ? _.maxBy(pointArr, 'x').x : -Infinity;
+    this.minY = isEmpty ? _.minBy(pointArr, 'y').y : +Infinity;
+    this.maxY = isEmpty ? _.maxBy(pointArr, 'y').y : -Infinity;
+    this.minR = isEmpty ? _.minBy(pointArr, 'r').r : +Infinity;
+    this.maxR = isEmpty ? _.maxBy(pointArr, 'r').r : 0;
   }
 
   add (point) {
@@ -121,6 +113,23 @@ class Points {
     console.log('minR:', this.minR, ', maxR:', this.maxR);
     this.pointArr.forEach(p => console.log({ x: p.x, y: p.y, r: p.r }));
   }
+
+  normalize () {
+    this.pointArr = this.pointArr.map(p => new Point({
+      x: (p.x - this.minX) / (this.maxX - this.minX),
+      y: (p.y - this.minY) / (this.maxY - this.minY),
+      r: (p.r - this.minR) / (this.maxR - this.minR),
+      c: p.c,
+      a: p.a
+    }));
+    this.minX = 0;
+    this.minY = 0;
+    this.minR = 0;
+    this.maxX = 1;
+    this.maxY = 1;
+    this.maxR = 1;
+  }
+
 }
 
 class Point {

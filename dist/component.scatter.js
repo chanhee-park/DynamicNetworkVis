@@ -20,6 +20,7 @@ var ScatterPlot = function (_React$Component) {
     _this.distances = _this.props.network.subNetDistances;
     _this.networks = _this.props.network.subNetworks;
     _this.points = ScatterPlot.getScatterData(_this.distances, _this.networks);
+    _this.points.normalize();
     return _this;
   }
 
@@ -53,17 +54,12 @@ var ScatterPlot = function (_React$Component) {
           drawBoxH = svgH - paddingTop - paddingBottom,
           maximumRadius = 25;
 
-      // define sizing variable for circles on the scatter plot.
-      var pointPosXRatio = drawBoxW / (points.maxX - points.minX);
-      var pointPosYRatio = drawBoxH / (points.maxY - points.minY);
-      var pointRadiusRatio = maximumRadius / points.maxR;
-
       // Define position, size, and color of  circles on the scatter plot 
       var getCircle = function getCircle(p) {
         return {
-          cx: (p.x - points.minX) * pointPosXRatio + paddingLeft + graphPdding,
-          cy: (p.y - points.minY) * pointPosYRatio + paddingTop + graphPdding,
-          r: p.r * pointRadiusRatio,
+          cx: p.x * drawBoxW + paddingLeft + graphPdding,
+          cy: p.y * drawBoxH + paddingTop + graphPdding,
+          r: p.r * maximumRadius,
           fill: p.c,
           opacity: p.a
         };
@@ -96,22 +92,20 @@ var ScatterPlot = function (_React$Component) {
   }], [{
     key: 'getScatterData',
     value: function getScatterData(distanceMatrix, networks) {
-      var N = networks.length;
-
-      // const vector = Util.pca(subNetDistances);
+      // const vector = Util.pca(distanceMatrix);
       var vector = Util.mds(distanceMatrix);
-      var points = new Points();
-      vector.forEach(function (v, i) {
-        points.add(new Point({
+      var N = networks.length;
+      var pointArr = vector.map(function (v, i) {
+        return new Point({
           x: v[0],
           y: v[1],
           r: Math.sqrt(networks[i].nodes.size),
           c: d3.interpolateGnBu((i + N / 4) / (N - 1 + N / 4)),
           a: 0.5
-        }));
+        });
       });
 
-      return points;
+      return new Points(pointArr);
     }
   }]);
 
@@ -124,12 +118,12 @@ var Points = function () {
 
     var isEmpty = typeof pointArr !== 'undefined';
     this.pointArr = isEmpty ? pointArr : [];
-    this.minX = isEmpty ? _.minBy(pointArr, 'x') : +Infinity;
-    this.maxX = isEmpty ? _.maxBy(pointArr, 'x') : -Infinity;
-    this.minY = isEmpty ? _.minBy(pointArr, 'y') : +Infinity;
-    this.maxY = isEmpty ? _.maxBy(pointArr, 'y') : -Infinity;
-    this.minR = isEmpty ? _.minBy(pointArr, 'r') : +Infinity;
-    this.maxR = isEmpty ? _.maxBy(pointArr, 'r') : 0;
+    this.minX = isEmpty ? _.minBy(pointArr, 'x').x : +Infinity;
+    this.maxX = isEmpty ? _.maxBy(pointArr, 'x').x : -Infinity;
+    this.minY = isEmpty ? _.minBy(pointArr, 'y').y : +Infinity;
+    this.maxY = isEmpty ? _.maxBy(pointArr, 'y').y : -Infinity;
+    this.minR = isEmpty ? _.minBy(pointArr, 'r').r : +Infinity;
+    this.maxR = isEmpty ? _.maxBy(pointArr, 'r').r : 0;
   }
 
   _createClass(Points, [{
@@ -152,6 +146,27 @@ var Points = function () {
       this.pointArr.forEach(function (p) {
         return console.log({ x: p.x, y: p.y, r: p.r });
       });
+    }
+  }, {
+    key: 'normalize',
+    value: function normalize() {
+      var _this2 = this;
+
+      this.pointArr = this.pointArr.map(function (p) {
+        return new Point({
+          x: (p.x - _this2.minX) / (_this2.maxX - _this2.minX),
+          y: (p.y - _this2.minY) / (_this2.maxY - _this2.minY),
+          r: (p.r - _this2.minR) / (_this2.maxR - _this2.minR),
+          c: p.c,
+          a: p.a
+        });
+      });
+      this.minX = 0;
+      this.minY = 0;
+      this.minR = 0;
+      this.maxX = 1;
+      this.maxY = 1;
+      this.maxR = 1;
     }
   }]);
 
