@@ -18,6 +18,7 @@ var Network = function () {
       this.subNetworks = Network.splitByTime(this);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
       this.subNetDistances = Network.getDistances(this.compareInfo, 'rough');
+      this.print();
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
       this.timeAvg = this.typeInfo.timeAvg;
@@ -62,7 +63,7 @@ var Network = function () {
   }, {
     key: 'splitByTime',
     value: function splitByTime(network) {
-      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 39;
+      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 30;
 
       // Get Time Interval
       var timeFirstAndLast = Util.minmax(network.times);

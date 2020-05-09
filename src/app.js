@@ -1,9 +1,10 @@
 class App {
   constructor() {
-    this.data = new Dataset(testsets[1].url, testsets[1].idxs);
+    const ts = testsets[3];
+    this.data = new Dataset(ts.url, ts.idxs, ts.sep);
 
     // FIXME: 테스트 속도를 위하여 확률 값을 0.25로 하였음 => 1로 변경 필요.
-    this.network = Dataset.getNetwork(this.data, 0.3);
+    this.network = Dataset.getNetwork(this.data, 1);
 
     // React Visualization Objects
     this.visualizations = {

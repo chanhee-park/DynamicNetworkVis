@@ -6,10 +6,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var testsets = [{
   url: './dataset/copresence-InVS13/copresence-InVS13.edges',
-  idxs: [0, 1, 2]
+  idxs: [0, 1, 2],
+  sep: ' '
 }, {
   url: './dataset/insecta-ant-colony6/insecta-ant-colony6.edges',
-  idxs: [0, 1, 3]
+  idxs: [0, 1, 3],
+  sep: ' '
+}, {
+  url: './dataset/SFHH-conf-sensor/SFHH-conf-sensor.edges',
+  idxs: [0, 1, 2],
+  sep: ','
+}, {
+  url: './dataset/ia-workplace-contacts/ia-workplace-contacts.edges',
+  idxs: [0, 1, 2],
+  sep: ','
 }];
 
 var Dataset = function () {

@@ -10,6 +10,7 @@ class Network {
       this.subNetworks = Network.splitByTime(this);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
       this.subNetDistances = Network.getDistances(this.compareInfo, 'rough');
+      this.print();
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
       this.timeAvg = this.typeInfo.timeAvg;
@@ -46,7 +47,7 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 39) {
+  static splitByTime (network, numberOfSplits = 30) {
     // Get Time Interval
     const timeFirstAndLast = Util.minmax(network.times);
     const timeFirst = timeFirstAndLast[0];

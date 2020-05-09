@@ -36,29 +36,23 @@ var ScatterPlot = function (_React$Component) {
     }
   }, {
     key: 'drawScatterPlot',
-    value: function drawScatterPlot(svg, points) {
+    value: function drawScatterPlot(svg, normPoints) {
       // get svg box 
       var svgBBox = svg.node().getBoundingClientRect();
-
-      // set render zone size
-      var svgW = svgBBox.width,
-          svgH = svgBBox.height,
-          paddingTop = 100,
-          paddingBottom = 50,
-          paddingLeft = 100,
-          paddingRight = 50,
-          graphPdding = 5;
+      var svgW = svgBBox.width;
+      var svgH = svgBBox.height;
+      var paddingGraph = 50;
 
       // set scatter plot graph size
-      var drawBoxW = svgW - paddingRight - paddingLeft,
-          drawBoxH = svgH - paddingTop - paddingBottom,
-          maximumRadius = 25;
+      var drawBoxW = svgW - paddingGraph * 2;
+      var drawBoxH = svgH - paddingGraph * 2;
+      var maximumRadius = paddingGraph / 2;
 
       // Define position, size, and color of  circles on the scatter plot 
       var getCircle = function getCircle(p) {
         return {
-          cx: p.x * drawBoxW + paddingLeft + graphPdding,
-          cy: p.y * drawBoxH + paddingTop + graphPdding,
+          cx: paddingGraph + drawBoxW * p.x,
+          cy: paddingGraph + drawBoxH * p.y,
           r: p.r * maximumRadius,
           fill: p.c,
           opacity: p.a
@@ -66,7 +60,7 @@ var ScatterPlot = function (_React$Component) {
       };
 
       // draw circles on the scatter plot
-      _.forEach(points.pointArr, function (p, i) {
+      normPoints.pointArr.forEach(function (p, i) {
         var attrs = getCircle(p);
         svg.append('circle').attrs(attrs);
         svg.append('text').text(i).attrs({
@@ -79,8 +73,31 @@ var ScatterPlot = function (_React$Component) {
       });
 
       // Draw Axis and Legend
+      var numberOfAxis = 5;
+      var axisW = svgW / (numberOfAxis + 1);
+      var axisH = svgH / (numberOfAxis + 1);
+      for (var i = 1; i <= numberOfAxis; i++) {
+        // 가로 선
+        svg.append('line').attrs({
+          x1: 0,
+          x2: svgW,
+          y1: i * axisH,
+          y2: i * axisH,
+          stroke: COLOR_AXIS
+        });
+        // 세로 선 
+        svg.append('line').attrs({
+          x1: i * axisW,
+          x2: i * axisW,
+          y1: 0,
+          y2: svgH,
+          stroke: COLOR_AXIS
+        });
+      }
+      // 가로 선 
 
-      // Draw Title 
+
+      // TODO: 확대 축소 클릭 호버 인터랙션
 
       return;
     }
