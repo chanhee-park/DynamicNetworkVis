@@ -17,7 +17,8 @@ var ScatterPlot = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (ScatterPlot.__proto__ || Object.getPrototypeOf(ScatterPlot)).call(this, props));
 
     _this.svg = Util.getSVG(_this.props.containerId);
-    _this.distances = _this.props.network.subNetDistances;
+    _this.distances = _this.props.network.subNetDistances.matrix;
+    _this.networkIdxs = _this.props.network.subNetDistances.idxs;
     _this.networks = _this.props.network.subNetworks;
     _this.points = ScatterPlot.getScatterData(_this.distances, _this.networks);
     _this.points.normalize();
@@ -27,16 +28,21 @@ var ScatterPlot = function (_React$Component) {
   _createClass(ScatterPlot, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.drawScatterPlot(this.svg, this.points);
+      ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
     }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      this.drawScatterPlot(this.svg, this.points);
+      ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
     }
   }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement('div', { id: "#" + this.props.id });
+    }
+  }], [{
     key: 'drawScatterPlot',
-    value: function drawScatterPlot(svg, normPoints) {
+    value: function drawScatterPlot(svg, normPoints, networkIdxs) {
       // get svg box 
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
@@ -46,14 +52,15 @@ var ScatterPlot = function (_React$Component) {
       // set scatter plot graph size
       var drawBoxW = svgW - paddingGraph * 2;
       var drawBoxH = svgH - paddingGraph * 2;
-      var maximumRadius = paddingGraph / 2;
+      var minRadius = 10;
+      var maxRadius = 25;
 
       // Define position, size, and color of  circles on the scatter plot 
       var getCircle = function getCircle(p) {
         return {
           cx: paddingGraph + drawBoxW * p.x,
           cy: paddingGraph + drawBoxH * p.y,
-          r: p.r * maximumRadius,
+          r: p.r * (maxRadius - minRadius) + minRadius,
           fill: p.c,
           opacity: p.a
         };
@@ -63,7 +70,7 @@ var ScatterPlot = function (_React$Component) {
       normPoints.pointArr.forEach(function (p, i) {
         var attrs = getCircle(p);
         svg.append('circle').attrs(attrs);
-        svg.append('text').text(i).attrs({
+        svg.append('text').text(networkIdxs[i]).attrs({
           x: attrs.cx,
           y: attrs.cy,
           'text-anchor': 'middle',
@@ -102,11 +109,6 @@ var ScatterPlot = function (_React$Component) {
       return;
     }
   }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement('div', { id: "#" + this.props.id });
-    }
-  }], [{
     key: 'getScatterData',
     value: function getScatterData(distanceMatrix, networks) {
       // const vector = Util.pca(distanceMatrix);

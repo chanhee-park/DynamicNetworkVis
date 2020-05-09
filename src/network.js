@@ -9,7 +9,7 @@ class Network {
       // 비어있지 않은 Total Network에만 적용
       this.subNetworks = Network.splitByTime(this);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
-      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough');
+      this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.subNetworks);
       this.print();
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
@@ -47,7 +47,7 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 30) {
+  static splitByTime (network, numberOfSplits = 100) {
     // Get Time Interval
     const timeFirstAndLast = Util.minmax(network.times);
     const timeFirst = timeFirstAndLast[0];
@@ -85,7 +85,7 @@ class Network {
     return network.subNetworks;
   }
 
-  static getDistances (compareInfo, similarityCriteria) {
+  static getDistances (compareInfo, similarityCriteria, networks) {
     const N = compareInfo.length;
     const ret = [...Array(N)].map(x => Array(N).fill(0));
     for (let i = 0; i < N; i++) {
@@ -95,17 +95,12 @@ class Network {
         ret[i][j] = disimilarity;
         ret[j][i] = disimilarity;
       }
-
-      /*
-       * ret[i][i] = 0 이면, 이상치 혼자 너무 작아서 스캐터 플롯이 잘 안그려진다.
-       * 따라서, 해당 행의 평균값을 값으로 사용한다. 
-       */
-      ret[i][i] = 0;
-      let summ = ret[i].reduce((a, b) => a + b, 0);
-      ret[i][i] = summ / (N - 1);
     }
-
-    return Util.normalize2d(ret);
+    const trimed = this.trimDistanceMatrix(ret, networks);
+    return {
+      matrix: Util.normalize2d(trimed.matrix),
+      idxs: trimed.idxs
+    };
   }
 
   static compareSeveral (networks) {
@@ -131,17 +126,13 @@ class Network {
       l1: links.preOnly.size,
       l2: links.postOnly.size,
     }
-    const roughN = (sizes.nc + 1) / (sizes.nc + sizes.n1 + sizes.n2 + 1);
-    const roughL = (sizes.lc + 1) / (sizes.lc + sizes.l1 + sizes.l2 + 1);
+    const roughN = (sizes.nc) / (sizes.nc + sizes.n1 + sizes.n2 + Number.MIN_VALUE);
+    const roughL = (sizes.lc) / (sizes.lc + sizes.l1 + sizes.l2 + Number.MIN_VALUE);
     const similarity = {
       roughNode: roughN,
       roughLink: roughL,
-      rough: Math.sqrt(roughN * roughL), // 기하평균 ( 0 <= value <= 1 )
+      rough: (roughN + roughL) / 2, // 산술평균 ( 0 <= value <= 1 )
     }
-    // console.log('---')
-    // console.log(nodes, roughN.toPrecision(3));
-    // console.log(links, roughL.toPrecision(3));
-    // console.warn(similarity.rough.toPrecision(3));
 
     return { nodes, links, similarity };
   }
@@ -160,6 +151,22 @@ class Network {
       otherLinksNoTime.add(Link.withoutTime(e));
     }
     return Util.compareSets(linksNoTime, otherLinksNoTime);
+  }
+
+  static trimDistanceMatrix (distances, networks) {
+    const matrix = [];
+    const idxs = [];
+    for (let i = 0; i < distances.length; i++) {
+      if (networks[i].nodes.size == 0) continue;
+      const retRow = [];
+      for (let j = 0; j < distances[i].length; j++) {
+        if (networks[j].nodes.size == 0) continue;
+        retRow.push(distances[i][j]);
+      }
+      matrix.push(retRow);
+      idxs.push(i);
+    }
+    return { matrix, idxs };
   }
 }
 
