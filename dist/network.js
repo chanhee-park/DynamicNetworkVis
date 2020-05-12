@@ -12,13 +12,13 @@ var Network = function () {
     this.nodes = typeof nodes !== 'undefined' ? nodes : new Set();
     this.links = typeof links !== 'undefined' ? links : new Set();
     this.times = typeof times !== 'undefined' ? times : new Set();
+    this.matrixNotation = Network.getMatrix(this);
 
     if (Network.isTotal(this) && !Network.isEmpty(this)) {
       // 비어있지 않은 Total Network에만 적용
       this.subNetworks = Network.splitByTime(this);
       this.compareInfo = Network.compareSeveral(this.subNetworks);
       this.subNetDistances = Network.getDistances(this.compareInfo, 'rough', this.subNetworks);
-      this.print();
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
       this.timeAvg = this.typeInfo.timeAvg;
@@ -28,8 +28,8 @@ var Network = function () {
   _createClass(Network, [{
     key: 'print',
     value: function print() {
+      console.log('- Network Print - ');
       console.log({
-        type: this.typeInfo.type,
         nodes: this.nodes,
         links: this.links,
         times: this.times,
@@ -146,6 +146,23 @@ var Network = function () {
       };
     }
   }, {
+    key: 'trimDistanceMatrix',
+    value: function trimDistanceMatrix(distances, networks) {
+      var matrix = [];
+      var idxs = [];
+      for (var i = 0; i < distances.length; i++) {
+        if (networks[i].nodes.size == 0) continue;
+        var retRow = [];
+        for (var j = 0; j < distances[i].length; j++) {
+          if (networks[j].nodes.size == 0) continue;
+          retRow.push(distances[i][j]);
+        }
+        matrix.push(retRow);
+        idxs.push(i);
+      }
+      return { matrix: matrix, idxs: idxs };
+    }
+  }, {
     key: 'compareSeveral',
     value: function compareSeveral(networks) {
       var N = networks.length;
@@ -246,21 +263,98 @@ var Network = function () {
       return Util.compareSets(linksNoTime, otherLinksNoTime);
     }
   }, {
-    key: 'trimDistanceMatrix',
-    value: function trimDistanceMatrix(distances, networks) {
-      var matrix = [];
-      var idxs = [];
-      for (var i = 0; i < distances.length; i++) {
-        if (networks[i].nodes.size == 0) continue;
-        var retRow = [];
-        for (var j = 0; j < distances[i].length; j++) {
-          if (networks[j].nodes.size == 0) continue;
-          retRow.push(distances[i][j]);
+    key: 'getMatrix',
+    value: function getMatrix(network) {
+      // 노드별 인덱스 지정
+      var nodeIdxs = {};
+      var nodeIdx = 0;
+      network.nodes.forEach(function (node) {
+        return nodeIdxs[node] = nodeIdx++;
+      });
+
+      // 행렬 타입으로 네트워크를 저장
+      var D = network.nodes.size;
+      var matrix = [].concat(_toConsumableArray(Array(D))).map(function (e) {
+        return Array(D).fill(0);
+      });
+      network.links.forEach(function (link) {
+        var from = link.from;
+        var to = link.to;
+        var fromIdx = from in nodeIdxs ? nodeIdxs[from] : nodeIdx++;
+        var toIdx = to in nodeIdxs ? nodeIdxs[to] : nodeIdx++;
+        matrix[fromIdx][toIdx] += 1;
+      });
+      return matrix;
+    }
+  }, {
+    key: 'getStatistics',
+    value: function getStatistics(network) {
+      var V = network.nodes.size; // number of nodes
+      var E = network.links.size; // number of links
+      var degrees = Network.getDegrees(network.matrixNotation); // node degrees
+      var D_MAX = Math.max.apply(Math, _toConsumableArray(Object.values(degrees)).concat([0])); // Maximum degree
+      var D_AVG = E / (V + Number.MIN_VALUE); // Average degree
+      var T = Network.countTriangle(network.matrixNotation); // Number Of triangles
+      var T_AVG = T / (E + Number.MIN_VALUE); // Average triangles formed by a edge
+
+      // TODO: 여러 statistics 추가
+      var T_MAX = 0; // Maximum number of triangles formed by a edge
+      var R = 0; // Assort. Coeff.
+      var K = 0; // Global clustering coefficient 
+      var K_AVG = 0; // Average local clustering coefficient
+      var K_MAX = 0; //  Maximum k-core number
+      var W_B = 0; // Lower bound on the size of the maximum clique
+
+      return {
+        TIME: typeof network.timeAvg !== 'undefined' ? network.timeAvg : 0,
+        V: V,
+        E: E,
+        D_MAX: D_MAX,
+        D_AVG: D_AVG,
+        T: T,
+        T_AVG: T_AVG
+      };
+    }
+  }, {
+    key: 'getStatisticsFromNetworks',
+    value: function getStatisticsFromNetworks(networks) {
+      return networks.map(function (n) {
+        return Network.getStatistics(n);
+      });
+    }
+  }, {
+    key: 'getDegrees',
+    value: function getDegrees(networkMatrix) {
+      var degrees = {};
+      networkMatrix.forEach(function (row, from) {
+        row.forEach(function (link, to) {
+          if (link > 0) {
+            degrees[from] = from in degrees ? degrees[from] + 1 : 1;
+            degrees[to] = to in degrees ? degrees[to] + 1 : 1;
+          }
+        });
+      });
+      return degrees;
+    }
+  }, {
+    key: 'countTriangle',
+    value: function countTriangle(g) {
+      var N = g.length;
+      var countTriangle = 0; // Initialize result
+
+      // Consider every possible triplet of edges in graph
+      for (var i = 0; i < N; i++) {
+        for (var j = 0; j < N; j++) {
+          for (var k = 0; k < N; k++) {
+            if (i != j && i != k && j != k && g[i][j] > 0 && g[j][k] && g[k][i]) {
+              countTriangle += 1;
+            }
+          }
         }
-        matrix.push(retRow);
-        idxs.push(i);
       }
-      return { matrix: matrix, idxs: idxs };
+
+      // if graph is directed, division is done by 3 else division by 6 is done
+      return countTriangle / 3;
     }
   }]);
 

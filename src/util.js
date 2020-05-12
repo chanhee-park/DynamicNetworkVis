@@ -136,6 +136,38 @@ class Util {
     return { preOnly, postOnly, common }
   }
 
+  // 행렬 곱하기
+  static multiplyMatrix (a, b) {
+    const aNumRows = a.length, aNumCols = a[0].length,
+      bNumRows = b.length, bNumCols = b[0].length,
+      m = new Array(aNumRows);  // initialize array of rows
+
+    for (var r = 0; r < aNumRows; ++r) {
+      m[r] = new Array(bNumCols); // initialize the current row
+      for (var c = 0; c < bNumCols; ++c) {
+        m[r][c] = 0;             // initialize the current cell
+        for (var i = 0; i < aNumCols; ++i) {
+          m[r][c] += a[r][i] * b[i][c];
+        }
+      }
+    }
+
+    return m;
+  }
+
+  // Collection Transpose 
+  static transposeCollection (collection) {
+    const keys = Object.keys(collection[0]);
+    const ret = {};
+    keys.forEach(k => ret[k] = []);
+    collection.forEach(obj => {
+      for (let key in obj) {
+        ret[key].push(obj[key]);
+      }
+    });
+    return ret;
+  }
+
   /**
    * PCA 차원축소
    * @param {number[]} arr2d row에 instances, colunm에 attributes 값을 담는 2차원 배열

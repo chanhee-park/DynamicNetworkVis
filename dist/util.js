@@ -272,6 +272,48 @@ var Util = function () {
       return { preOnly: preOnly, postOnly: postOnly, common: common };
     }
 
+    // 행렬 곱하기
+
+  }, {
+    key: "multiplyMatrix",
+    value: function multiplyMatrix(a, b) {
+      var aNumRows = a.length,
+          aNumCols = a[0].length,
+          bNumRows = b.length,
+          bNumCols = b[0].length,
+          m = new Array(aNumRows); // initialize array of rows
+
+      for (var r = 0; r < aNumRows; ++r) {
+        m[r] = new Array(bNumCols); // initialize the current row
+        for (var c = 0; c < bNumCols; ++c) {
+          m[r][c] = 0; // initialize the current cell
+          for (var i = 0; i < aNumCols; ++i) {
+            m[r][c] += a[r][i] * b[i][c];
+          }
+        }
+      }
+
+      return m;
+    }
+
+    // Collection Transpose 
+
+  }, {
+    key: "transposeCollection",
+    value: function transposeCollection(collection) {
+      var keys = Object.keys(collection[0]);
+      var ret = {};
+      keys.forEach(function (k) {
+        return ret[k] = [];
+      });
+      collection.forEach(function (obj) {
+        for (var key in obj) {
+          ret[key].push(obj[key]);
+        }
+      });
+      return ret;
+    }
+
     /**
      * PCA 차원축소
      * @param {number[]} arr2d row에 instances, colunm에 attributes 값을 담는 2차원 배열

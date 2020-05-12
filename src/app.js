@@ -1,10 +1,11 @@
 class App {
+  // TODO: App을 최상위 리액트 컴포넌트로 사용하자.
   constructor() {
     const ts = testsets[3];
     this.data = new Dataset(ts.url, ts.idxs, ts.sep);
 
     // FIXME: 테스트 속도를 위하여 확률 값을 0.25로 하였음 => 1로 변경 필요.
-    this.network = Dataset.getNetwork(this.data, 1);
+    this.network = Dataset.getNetwork(this.data, 0.25);
 
     // React Visualization Objects
     this.visualizations = {
@@ -24,6 +25,11 @@ class App {
       />,
 
       // 3) parallel coordinate
+      parallel: <PCoold
+        title="Network Statistics by Time"
+        containerId='#parallel-container'
+        network={this.network}
+      />,
 
       // 4) small multiples of node-link diagram
 

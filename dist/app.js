@@ -5,6 +5,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var App = function () {
+  // TODO: App을 최상위 리액트 컴포넌트로 사용하자.
   function App() {
     _classCallCheck(this, App);
 
@@ -12,7 +13,7 @@ var App = function () {
     this.data = new Dataset(ts.url, ts.idxs, ts.sep);
 
     // FIXME: 테스트 속도를 위하여 확률 값을 0.25로 하였음 => 1로 변경 필요.
-    this.network = Dataset.getNetwork(this.data, 1);
+    this.network = Dataset.getNetwork(this.data, 0.25);
 
     // React Visualization Objects
     this.visualizations = {
@@ -29,9 +30,14 @@ var App = function () {
         title: "Network Similarity Between The Time",
         containerId: "#scatter-container",
         network: this.network
-      })
+      }),
 
       // 3) parallel coordinate
+      parallel: React.createElement(PCoold, {
+        title: "Network Statistics by Time",
+        containerId: "#parallel-container",
+        network: this.network
+      })
 
       // 4) small multiples of node-link diagram
 
