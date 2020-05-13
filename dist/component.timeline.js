@@ -286,6 +286,7 @@ var Timeline = function (_React$Component) {
         avgTimes.push(subNetworks[i].timeAvg);
       }
 
+      console.log(Util.max(sizes));
       return { bars: ret, maxSize: Util.max(sizes), avgTimes: avgTimes };
     }
   }, {

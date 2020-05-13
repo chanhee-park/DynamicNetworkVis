@@ -22,6 +22,7 @@ var Network = function () {
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
       this.timeAvg = this.typeInfo.timeAvg;
+      this.stats = Network.getStatistics(this);
     }
   }
 
@@ -63,7 +64,7 @@ var Network = function () {
   }, {
     key: 'splitByTime',
     value: function splitByTime(network) {
-      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 200;
+      var numberOfSplits = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 
       // Get Time Interval
       var timeFirstAndLast = Util.minmax(network.times);

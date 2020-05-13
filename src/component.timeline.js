@@ -69,15 +69,13 @@ class Timeline extends React.Component {
       height: 15,
       fill: COLOR_COM_LINK
     });
-    svg.append('text')
-      .text('Remained')
-      .attrs({
-        x: colorLegendXStart + 15 * 2.2,
-        y: colorLegendY + 15 / 2,
-        'text-anchor': 'start',
-        'alignment-baseline': 'central',
-        'font-size': 14
-      });
+    svg.append('text').text('Remained').attrs({
+      x: colorLegendXStart + 15 * 2.2,
+      y: colorLegendY + 15 / 2,
+      'text-anchor': 'start',
+      'alignment-baseline': 'central',
+      'font-size': 14
+    });
 
     // Added Nodes & Links Color Legend
     svg.append('rect').attrs({
@@ -285,6 +283,7 @@ class Timeline extends React.Component {
       avgTimes.push(subNetworks[i].timeAvg);
     }
 
+    console.log(Util.max(sizes));
     return { bars: ret, maxSize: Util.max(sizes), avgTimes };
   }
 

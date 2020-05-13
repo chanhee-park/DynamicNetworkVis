@@ -14,6 +14,7 @@ class Network {
     } else if (this.typeInfo.type != Network.typeTotal().type) {
       // Sub Netwokr에만 적용
       this.timeAvg = this.typeInfo.timeAvg;
+      this.stats = Network.getStatistics(this);
     }
   }
 
@@ -47,7 +48,7 @@ class Network {
     }
   }
 
-  static splitByTime (network, numberOfSplits = 200) {
+  static splitByTime (network, numberOfSplits = 100) {
     // Get Time Interval
     const timeFirstAndLast = Util.minmax(network.times);
     const timeFirst = timeFirstAndLast[0];
