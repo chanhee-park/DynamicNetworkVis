@@ -13,25 +13,30 @@ class App {
       // 1) timeline
       timeline: <Timeline
         title="Network Change Timeline"
-        containerId='#timeline-container'
+        containerId='timeline-container'
         network={this.network}
       />,
 
       // 2) scatter plot
       scatter: < ScatterPlot
         title="Network Similarity Between The Time"
-        containerId='#scatter-container'
+        containerId='scatter-container'
         network={this.network}
       />,
 
       // 3) parallel coordinate
       parallel: <PCoold
         title="Network Statistics by Time"
-        containerId='#parallel-container'
+        containerId='parallel-container'
         network={this.network}
       />,
 
       // 4) small multiples of node-link diagram
+      smalls: <Smalls
+        title="Node-Link Diagrams by time"
+        containerId='smalls-container'
+        network={this.network}
+      />,
 
       // 5) node statistics table
 

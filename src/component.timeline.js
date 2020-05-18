@@ -12,7 +12,6 @@ class Timeline extends React.Component {
     this.createTimeline();
   }
 
-  // TODO: 엣지 교집합 안생기는거 오류인지 확인
   createTimeline () {
     // get time compared data
     const timelineInfo = this.getTimelineInfo(this.props.network);
@@ -21,7 +20,7 @@ class Timeline extends React.Component {
     const avgTimes = timelineInfo.avgTimes;
 
     // set rendering size
-    const svg = Util.getSVG(this.props.containerId);
+    const svg = Util.generateSVG(`#${this.props.containerId}`);
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
     const svgH = svgBBox.height;
@@ -283,7 +282,6 @@ class Timeline extends React.Component {
       avgTimes.push(subNetworks[i].timeAvg);
     }
 
-    console.log(Util.max(sizes));
     return { bars: ret, maxSize: Util.max(sizes), avgTimes };
   }
 

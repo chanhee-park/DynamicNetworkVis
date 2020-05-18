@@ -1,7 +1,7 @@
 class PCoold extends React.Component {
   constructor(props) {
     super(props);
-    this.svg = Util.getSVG(this.props.containerId);
+    this.svg = Util.generateSVG(`#${this.props.containerId}`);
     this.networks = this.props.network.subNetworks;
     this.statsMinMax = PCoold.minMaxStats(this.networks);
   }

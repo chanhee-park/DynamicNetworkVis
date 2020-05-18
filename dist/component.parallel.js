@@ -16,7 +16,7 @@ var PCoold = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (PCoold.__proto__ || Object.getPrototypeOf(PCoold)).call(this, props));
 
-    _this.svg = Util.getSVG(_this.props.containerId);
+    _this.svg = Util.generateSVG('#' + _this.props.containerId);
     _this.networks = _this.props.network.subNetworks;
     _this.statsMinMax = PCoold.minMaxStats(_this.networks);
     return _this;

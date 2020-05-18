@@ -21,7 +21,7 @@ class Util {
    * svg를 생성하고 리턴한다. 
    * @param {string} selector 선택자 스트링 (eg. '#my_container')
    */
-  static getSVG (selector) {
+  static generateSVG (selector) {
     const container = d3.select(selector);
     const containerBBox = container.node().getBoundingClientRect();
     const svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;

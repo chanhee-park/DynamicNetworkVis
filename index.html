@@ -13,6 +13,7 @@
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   <script src="https://d3js.org/d3-selection.v1.min.js"></script>
   <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pca-js@1.0.0/pca.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
 </head>
@@ -54,8 +55,13 @@
     <div class="container-group bottom">
 
       <!-- Small Multiples -->
-      <div class="container"
-           id='smalls-container'></div>
+      <div class="container-wrapper"
+           id='smalls-container-wrapper'>
+        <div class="container"
+             id='smalls-container'>
+        </div>
+      </div>
+
 
       <!-- Small Multiples -->
       <div class="container"
@@ -86,6 +92,7 @@
   <script src="dist/component.timeline.js"></script>
   <script src="dist/component.scatter.js"></script>
   <script src="dist/component.parallel.js"></script>
+  <script src="dist/component.smalls.js"></script>
 
   <!-- index.js -->
   <script src="dist/index.js"></script>

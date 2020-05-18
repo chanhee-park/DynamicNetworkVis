@@ -21,25 +21,30 @@ var App = function () {
       // 1) timeline
       timeline: React.createElement(Timeline, {
         title: "Network Change Timeline",
-        containerId: "#timeline-container",
+        containerId: "timeline-container",
         network: this.network
       }),
 
       // 2) scatter plot
       scatter: React.createElement(ScatterPlot, {
         title: "Network Similarity Between The Time",
-        containerId: "#scatter-container",
+        containerId: "scatter-container",
         network: this.network
       }),
 
       // 3) parallel coordinate
       parallel: React.createElement(PCoold, {
         title: "Network Statistics by Time",
-        containerId: "#parallel-container",
+        containerId: "parallel-container",
         network: this.network
-      })
+      }),
 
       // 4) small multiples of node-link diagram
+      smalls: React.createElement(Smalls, {
+        title: "Node-Link Diagrams by time",
+        containerId: "smalls-container",
+        network: this.network
+      })
 
       // 5) node statistics table
 

@@ -28,9 +28,6 @@ var Timeline = function (_React$Component) {
     value: function componentDidUpdate() {
       this.createTimeline();
     }
-
-    // TODO: 엣지 교집합 안생기는거 오류인지 확인
-
   }, {
     key: 'createTimeline',
     value: function createTimeline() {
@@ -41,7 +38,7 @@ var Timeline = function (_React$Component) {
       var avgTimes = timelineInfo.avgTimes;
 
       // set rendering size
-      var svg = Util.getSVG(this.props.containerId);
+      var svg = Util.generateSVG('#' + this.props.containerId);
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
       var svgH = svgBBox.height;
@@ -286,7 +283,6 @@ var Timeline = function (_React$Component) {
         avgTimes.push(subNetworks[i].timeAvg);
       }
 
-      console.log(Util.max(sizes));
       return { bars: ret, maxSize: Util.max(sizes), avgTimes: avgTimes };
     }
   }, {

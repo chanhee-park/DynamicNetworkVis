@@ -1,7 +1,7 @@
 class ScatterPlot extends React.Component {
   constructor(props) {
     super(props);
-    this.svg = Util.getSVG(this.props.containerId);
+    this.svg = Util.generateSVG(`#${this.props.containerId}`);
     this.distances = this.props.network.subNetDistances.matrix;
     this.networkIdxs = this.props.network.subNetDistances.idxs;
     this.networks = this.props.network.subNetworks;

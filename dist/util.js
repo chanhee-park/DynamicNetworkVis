@@ -36,8 +36,8 @@ var Util = function () {
      */
 
   }, {
-    key: "getSVG",
-    value: function getSVG(selector) {
+    key: "generateSVG",
+    value: function generateSVG(selector) {
       var container = d3.select(selector);
       var containerBBox = container.node().getBoundingClientRect();
       var svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;

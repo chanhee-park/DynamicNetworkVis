@@ -84,12 +84,32 @@ body {
 }
 
 /* .container => .container-group.bottom */
-.container#smalls-container {
+.container-wrapper#smalls-container-wrapper {
   flex: 6;
+  width: 100%;
+  overflow-x: scroll;
+}
+
+.container#smalls-container {
+  max-height: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  margin: 0 auto;
+  padding: 5px;
 }
 
 .container#table-container {
   flex: 4;
+}
+
+/* Node Link Diagram */
+.container#smalls-container>.diagram {
+  display: inline-block;
+  width: 320px;
+  height: 100%;
+  margin: auto 2px;
+  border: 1px solid #ccc;
 }
 
 

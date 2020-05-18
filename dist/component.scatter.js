@@ -16,7 +16,7 @@ var ScatterPlot = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ScatterPlot.__proto__ || Object.getPrototypeOf(ScatterPlot)).call(this, props));
 
-    _this.svg = Util.getSVG(_this.props.containerId);
+    _this.svg = Util.generateSVG('#' + _this.props.containerId);
     _this.distances = _this.props.network.subNetDistances.matrix;
     _this.networkIdxs = _this.props.network.subNetDistances.idxs;
     _this.networks = _this.props.network.subNetworks;
