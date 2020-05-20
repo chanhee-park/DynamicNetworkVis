@@ -16,33 +16,37 @@ var ScatterPlot = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ScatterPlot.__proto__ || Object.getPrototypeOf(ScatterPlot)).call(this, props));
 
-    _this.svg = Util.generateSVG('#' + _this.props.containerId);
-    _this.distances = _this.props.network.subNetDistances.matrix;
-    _this.networkIdxs = _this.props.network.subNetDistances.idxs;
-    _this.networks = _this.props.network.subNetworks;
-    _this.points = ScatterPlot.getScatterData(_this.distances, _this.networks, _this.networkIdxs);
-    _this.points.normalize();
+    var distances = _this.props.network.subNetDistances.matrix;
+    var networks = _this.props.network.subNetworks;
+    var networkIdxs = _this.props.network.subNetDistances.idxs;
+    _this.state = {
+      svg: null,
+      points: ScatterPlot.getScatterData(distances, networks, networkIdxs)
+    };
     return _this;
   }
 
   _createClass(ScatterPlot, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
+      var containerId = Util.getParentIdOfReactComp(this);
+      this.setState({
+        svg: Util.generateSVG(containerId)
+      });
     }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
+      ScatterPlot.drawScatterPlot(this.state.svg, this.state.points);
     }
   }, {
     key: 'render',
     value: function render() {
-      return React.createElement('div', { id: "#" + this.props.id });
+      return React.createElement('div', null);
     }
   }], [{
     key: 'drawScatterPlot',
-    value: function drawScatterPlot(svg, normPoints, networkIdxs) {
+    value: function drawScatterPlot(svg, normPoints) {
       // get svg box 
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
@@ -123,7 +127,7 @@ var ScatterPlot = function (_React$Component) {
         });
       });
 
-      return new Points(pointArr);
+      return new Points(pointArr).normalize();
     }
   }]);
 
@@ -185,6 +189,8 @@ var Points = function () {
       this.maxX = 1;
       this.maxY = 1;
       this.maxR = 1;
+
+      return this;
     }
   }]);
 

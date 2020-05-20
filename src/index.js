@@ -1,5 +1,3 @@
-const myapp = new App();
-
 
 // TODO: REACT 제대로 적용
 

@@ -14,31 +14,35 @@ var Timeline = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Timeline.__proto__ || Object.getPrototypeOf(Timeline)).call(this, props));
 
-    _this.createTimeline = _this.createTimeline.bind(_this);
-    return _this;
+    _this.state = {
+      svg: null,
+      timelineInfo: Timeline.getTimelineInfo(_this.props.network)
+      // this.createTimeline = this.createTimeline.bind(this);
+    };return _this;
   }
 
   _createClass(Timeline, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.createTimeline();
+      var containerId = Util.getParentIdOfReactComp(this);
+      this.setState({
+        svg: Util.generateSVG(containerId)
+      });
     }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      this.createTimeline();
+      this.createTimeline(this.state.svg, this.state.timelineInfo);
     }
   }, {
     key: 'createTimeline',
-    value: function createTimeline() {
+    value: function createTimeline(svg, timelineInfo) {
       // get time compared data
-      var timelineInfo = this.getTimelineInfo(this.props.network);
       var bars = timelineInfo.bars;
       var max = timelineInfo.maxSize;
       var avgTimes = timelineInfo.avgTimes;
 
       // set rendering size
-      var svg = Util.generateSVG('#' + this.props.containerId);
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;
       var svgH = svgBBox.height;
@@ -54,17 +58,6 @@ var Timeline = function (_React$Component) {
 
       var xStart = barInterval - barW;
       var xEnd = svgW - paddingRight;
-
-      // title
-      // svg.append('text')
-      //   .text('Network Change Timeline')
-      //   .attrs({
-      //     x: 10,
-      //     y: 10,
-      //     'text-anchor': 'start',
-      //     'alignment-baseline': 'hanging',
-      //     'font-size': 18
-      //   });
 
       // Legend - colors
       var colorLegendW = 100;
@@ -269,6 +262,11 @@ var Timeline = function (_React$Component) {
       });
     }
   }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement('div', { id: "#" + this.props.id });
+    }
+  }], [{
     key: 'getTimelineInfo',
     value: function getTimelineInfo(totalNetwork) {
       var subNetworks = totalNetwork.subNetworks;
@@ -284,11 +282,6 @@ var Timeline = function (_React$Component) {
       }
 
       return { bars: ret, maxSize: Util.max(sizes), avgTimes: avgTimes };
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement('div', { id: "#" + this.props.id });
     }
   }]);
 

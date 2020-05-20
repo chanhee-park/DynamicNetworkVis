@@ -16,21 +16,26 @@ var PCoold = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (PCoold.__proto__ || Object.getPrototypeOf(PCoold)).call(this, props));
 
-    _this.svg = Util.generateSVG('#' + _this.props.containerId);
-    _this.networks = _this.props.network.subNetworks;
-    _this.statsMinMax = PCoold.minMaxStats(_this.networks);
+    _this.state = {
+      svg: null,
+      networks: _this.props.network.subNetworks,
+      statsMinMax: PCoold.minMaxStats(_this.props.network.subNetworks)
+    };
     return _this;
   }
 
   _createClass(PCoold, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      PCoold.drawPCoold(this.svg, this.networks, this.statsMinMax);
+      var containerId = Util.getParentIdOfReactComp(this);
+      this.setState({
+        svg: Util.generateSVG(containerId)
+      });
     }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      PCoold.drawPCoold(this.svg, this.networks, this.statsMinMax);
+      PCoold.drawPCoold(this.state.svg, this.state.networks, this.state.statsMinMax);
     }
   }, {
     key: 'render',

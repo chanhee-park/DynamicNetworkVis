@@ -1,26 +1,31 @@
 class Timeline extends React.Component {
   constructor(props) {
     super(props);
-    this.createTimeline = this.createTimeline.bind(this);
+    this.state = {
+      svg: null,
+      timelineInfo: Timeline.getTimelineInfo(this.props.network),
+    }
+    // this.createTimeline = this.createTimeline.bind(this);
   }
 
   componentDidMount () {
-    this.createTimeline();
+    const containerId = Util.getParentIdOfReactComp(this);
+    this.setState({
+      svg: Util.generateSVG(containerId)
+    });
   }
 
   componentDidUpdate () {
-    this.createTimeline();
+    this.createTimeline(this.state.svg, this.state.timelineInfo);
   }
 
-  createTimeline () {
+  createTimeline (svg, timelineInfo) {
     // get time compared data
-    const timelineInfo = this.getTimelineInfo(this.props.network);
     const bars = timelineInfo.bars;
     const max = timelineInfo.maxSize;
     const avgTimes = timelineInfo.avgTimes;
 
     // set rendering size
-    const svg = Util.generateSVG(`#${this.props.containerId}`);
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
     const svgH = svgBBox.height;
@@ -36,17 +41,6 @@ class Timeline extends React.Component {
 
     const xStart = barInterval - barW;
     const xEnd = svgW - paddingRight;
-
-    // title
-    // svg.append('text')
-    //   .text('Network Change Timeline')
-    //   .attrs({
-    //     x: 10,
-    //     y: 10,
-    //     'text-anchor': 'start',
-    //     'alignment-baseline': 'hanging',
-    //     'font-size': 18
-    //   });
 
     // Legend - colors
     const colorLegendW = 100;
@@ -269,7 +263,7 @@ class Timeline extends React.Component {
     });
   }
 
-  getTimelineInfo (totalNetwork) {
+  static getTimelineInfo (totalNetwork) {
     const subNetworks = totalNetwork.subNetworks;
     const ret = [Network.compare(new Network(), subNetworks[0])];
     const sizes = [subNetworks[0].nodes.size, subNetworks[0].links.size];

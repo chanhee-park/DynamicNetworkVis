@@ -19,59 +19,7 @@
 </head>
 
 <body>
-  <div class="app">
-
-    <!-- TOP START -->
-    <div class="container-group top">
-
-      <!-- Time Line -->
-      <div class="container"
-           id='timeline-container'></div>
-
-      <div id="tooltip"
-           class="hidden">
-        <p><strong>Network is changed</strong></p>
-        <p><span id="value">-</span></p>
-      </div>
-
-    </div>
-    <!-- TOP END -->
-
-    <!-- BODY START -->
-    <div class="container-group body">
-
-      <!-- Scatter Plot -->
-      <div class="container"
-           id='scatter-container'></div>
-
-      <!-- Parallel Coordinate -->
-      <div class="container"
-           id='parallel-container'></div>
-
-    </div>
-    <!-- BODY END -->
-
-    <!-- BOTTOM START -->
-    <div class="container-group bottom">
-
-      <!-- Small Multiples -->
-      <div class="container-wrapper"
-           id='smalls-container-wrapper'>
-        <div class="container"
-             id='smalls-container'>
-        </div>
-      </div>
-
-
-      <!-- Small Multiples -->
-      <div class="container"
-           id='table-container'></div>
-
-    </div>
-    <!-- BOTTOM END-->
-
-  </div>
-
+  <div id="root"></div>
 
   <!-- React -->
   <script src="https://unpkg.com/react@16/umd/react.production.min.js"
@@ -88,11 +36,11 @@
   <script src="dist/data.js"></script>
 
   <!-- App and React components-->
-  <script src="dist/app.js"></script>
   <script src="dist/component.timeline.js"></script>
   <script src="dist/component.scatter.js"></script>
   <script src="dist/component.parallel.js"></script>
   <script src="dist/component.smalls.js"></script>
+  <script src="dist/app.js"></script>
 
   <!-- index.js -->
   <script src="dist/index.js"></script>

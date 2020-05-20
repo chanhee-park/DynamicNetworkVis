@@ -19,17 +19,21 @@ class Util {
 
   /**
    * svg를 생성하고 리턴한다. 
-   * @param {string} selector 선택자 스트링 (eg. '#my_container')
+   * @param {string} id id 스트링 (eg. 'my_container')
    */
-  static generateSVG (selector) {
-    const container = d3.select(selector);
-    const containerBBox = container.node().getBoundingClientRect();
-    const svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;
-    const svgH = containerBBox.height - 2 * PADDING_FOR_SECTION;
+  static generateSVG (id) {
+    const container = d3.select(`#${id}`);
+    const bBox = container.node().getBoundingClientRect();
+    const svgW = bBox.width - 2 * PADDING_FOR_SECTION;
+    const svgH = bBox.height - 2 * PADDING_FOR_SECTION;
 
     return container.append("svg")
       .attr("width", svgW)
       .attr("height", svgH);
+  }
+
+  static getParentIdOfReactComp (ReactComp) {
+    return ReactDOM.findDOMNode(ReactComp).parentNode.getAttribute('id')
   }
 
   /**

@@ -1,18 +1,21 @@
 class Smalls extends React.Component {
   constructor(props) {
     super(props);
-    this.containerId = this.props.containerId;
-    this.container = document.getElementById(this.containerId);
-    this.networks = this.props.network.subNetworks;
-    // this.container.style.width = this.networks.length * 325;
+    this.state = {
+      container: null,
+      networks: this.props.network.subNetworks,
+    }
   }
 
   componentDidMount () {
-    Smalls.drawSmalls(this.container, this.networks);
+    const containerId = Util.getParentIdOfReactComp(this);
+    this.setState({
+      container: document.getElementById(containerId),
+    });
   }
 
   componentDidUpdate () {
-    Smalls.drawSmalls(this.container, this.networks);
+    Smalls.drawSmalls(this.state.container, this.state.networks);
   }
 
   static drawSmalls (container, networks) {
@@ -26,7 +29,7 @@ class Smalls extends React.Component {
         diagramDiv.setAttribute("class", "diagram");
         diagramDiv.setAttribute("id", diagramId);
         container.appendChild(diagramDiv);
-        if (cnt < 6) {
+        if (cnt < 2) {
           cnt++;
           console.log(cnt, i, network);
           NodeLinkDiagram.draw(diagramId, network);
@@ -41,33 +44,37 @@ class Smalls extends React.Component {
 }
 
 class NodeLinkDiagram {
-  constructor() { }
-
   static draw (containerId, network) {
-
-    // set visNodes
-    const nodes = [];
-    for (let node of network.nodes) {
-      nodes.push({ id: node, label: node });
-    }
-    const visNodes = new vis.DataSet(nodes);
-
-    // set visEdges
-    const adges = [];
-    for (let link of network.links) {
-      adges.push({ from: link.from, to: link.to });
-    }
-    const visEdges = new vis.DataSet(adges);
-
-    // draw
     var container = document.getElementById(containerId);
     var data = {
-      nodes: visNodes,
-      edges: visEdges
+      nodes: NodeLinkDiagram.getVisNodes(network),
+      edges: NodeLinkDiagram.getVisEdges(network)
     };
     var options = {};
+
     var network = new vis.Network(container, data, options);
   }
 
+  static getVisNodes (network) {
+    const nodes = [...network.nodes].map(node => (
+      { id: node, label: node }
+    ));
+    return new vis.DataSet(nodes);
+  }
 
+  static getVisEdges (network) {
+    const edgeMap = {};
+    for (let link of network.links) {
+      const from = Math.min(link.from, link.to);
+      const to = Math.max(link.from, link.to);
+      const key = `${from}-${to}`;
+      if (key in edgeMap) {
+        edgeMap[key].value += 1;
+      } else {
+        edgeMap[key] = { from, to, value: 1 };
+      }
+    }
+    const edges = Object.values(edgeMap);
+    return new vis.DataSet(edges);
+  }
 }

@@ -1,59 +1,95 @@
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var App = function () {
-  // TODO: App을 최상위 리액트 컴포넌트로 사용하자.
-  function App() {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var App = function (_React$Component) {
+  _inherits(App, _React$Component);
+
+  function App(props) {
     _classCallCheck(this, App);
 
-    var ts = testsets[3];
-    this.data = new Dataset(ts.url, ts.idxs, ts.sep);
-
-    // FIXME: 테스트 속도를 위하여 확률 값을 0.25로 하였음 => 1로 변경 필요.
-    this.network = Dataset.getNetwork(this.data, 1);
-
-    // React Visualization Objects
-    this.visualizations = {
-
-      // 1) timeline
-      timeline: React.createElement(Timeline, {
-        title: "Network Change Timeline",
-        containerId: "timeline-container",
-        network: this.network
-      }),
-
-      // 2) scatter plot
-      scatter: React.createElement(ScatterPlot, {
-        title: "Network Similarity Between The Time",
-        containerId: "scatter-container",
-        network: this.network
-      }),
-
-      // 3) parallel coordinate
-      parallel: React.createElement(PCoold, {
-        title: "Network Statistics by Time",
-        containerId: "parallel-container",
-        network: this.network
-      }),
-
-      // 4) small multiples of node-link diagram
-      smalls: React.createElement(Smalls, {
-        title: "Node-Link Diagrams by time",
-        containerId: "smalls-container",
-        network: this.network
-      })
-
-      // 5) node statistics table
-
-    };
-
-    this.start();
+    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
   }
 
   _createClass(App, [{
+    key: "render",
+    value: function render() {
+      return React.createElement(
+        "div",
+        { "class": "app" },
+        React.createElement(
+          "div",
+          { "class": "container-group top" },
+          React.createElement(
+            "div",
+            { "class": "container",
+              id: "timeline-container" },
+            React.createElement(Timeline, { network: this.props.network })
+          ),
+          React.createElement(
+            "div",
+            { id: "tooltip",
+              "class": "hidden" },
+            React.createElement(
+              "p",
+              null,
+              React.createElement(
+                "strong",
+                null,
+                "Network is changed"
+              )
+            ),
+            React.createElement(
+              "p",
+              null,
+              React.createElement(
+                "span",
+                { id: "value" },
+                "-"
+              )
+            )
+          )
+        ),
+        React.createElement(
+          "div",
+          { "class": "container-group body" },
+          React.createElement(
+            "div",
+            { "class": "container",
+              id: "scatter-container" },
+            React.createElement(ScatterPlot, { network: this.props.network })
+          ),
+          React.createElement(
+            "div",
+            { "class": "container",
+              id: "parallel-container" },
+            React.createElement(PCoold, { network: this.props.network })
+          )
+        ),
+        React.createElement(
+          "div",
+          { "class": "container-group bottom" },
+          React.createElement(
+            "div",
+            { "class": "container-wrapper",
+              id: "smalls-container-wrapper" },
+            React.createElement(
+              "div",
+              { "class": "container",
+                id: "smalls-container" },
+              React.createElement(Smalls, { network: this.props.network })
+            )
+          ),
+          React.createElement("div", { "class": "container",
+            id: "table-container" })
+        )
+      );
+    }
+  }, {
     key: "print",
     value: function print() {
       console.log('-- APP --');
@@ -61,24 +97,25 @@ var App = function () {
       console.log('netw:', this.network);
       console.log('visu:', this.visualizations);
     }
-  }, {
-    key: "start",
-    value: function start() {
-      this.updateVis();
-    }
-  }, {
-    key: "updateVis",
-    value: function updateVis() {
-      Object.entries(this.visualizations).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            key = _ref2[0],
-            vis = _ref2[1];
 
-        var container = document.querySelector("#" + key + "-container");
-        ReactDOM.render(vis, container);
-      });
-    }
+    // start () {
+    //   this.updateVis();
+    // }
+
+    // updateVis () {
+    //   Object.entries(this.visualizations).forEach(([key, vis]) => {
+    //     const container = document.querySelector(`#${key}-container`);
+    //     ReactDOM.render(vis, container);
+    //   });
+    // }
+
   }]);
 
   return App;
-}();
+}(React.Component);
+
+var ts = testsets[3];
+var data = new Dataset(ts.url, ts.idxs, ts.sep);
+var network = Dataset.getNetwork(data, 1);
+
+ReactDOM.render(React.createElement(App, { network: network }), document.getElementById('root'));

@@ -32,18 +32,23 @@ var Util = function () {
 
     /**
      * svg를 생성하고 리턴한다. 
-     * @param {string} selector 선택자 스트링 (eg. '#my_container')
+     * @param {string} id id 스트링 (eg. 'my_container')
      */
 
   }, {
     key: "generateSVG",
-    value: function generateSVG(selector) {
-      var container = d3.select(selector);
-      var containerBBox = container.node().getBoundingClientRect();
-      var svgW = containerBBox.width - 2 * PADDING_FOR_SECTION;
-      var svgH = containerBBox.height - 2 * PADDING_FOR_SECTION;
+    value: function generateSVG(id) {
+      var container = d3.select("#" + id);
+      var bBox = container.node().getBoundingClientRect();
+      var svgW = bBox.width - 2 * PADDING_FOR_SECTION;
+      var svgH = bBox.height - 2 * PADDING_FOR_SECTION;
 
       return container.append("svg").attr("width", svgW).attr("height", svgH);
+    }
+  }, {
+    key: "getParentIdOfReactComp",
+    value: function getParentIdOfReactComp(ReactComp) {
+      return ReactDOM.findDOMNode(ReactComp).parentNode.getAttribute('id');
     }
 
     /**

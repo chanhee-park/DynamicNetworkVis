@@ -1,24 +1,27 @@
 class ScatterPlot extends React.Component {
   constructor(props) {
     super(props);
-    this.svg = Util.generateSVG(`#${this.props.containerId}`);
-    this.distances = this.props.network.subNetDistances.matrix;
-    this.networkIdxs = this.props.network.subNetDistances.idxs;
-    this.networks = this.props.network.subNetworks;
-    this.points = ScatterPlot.getScatterData(
-      this.distances, this.networks, this.networkIdxs);
-    this.points.normalize();
+    const distances = this.props.network.subNetDistances.matrix;
+    const networks = this.props.network.subNetworks;
+    const networkIdxs = this.props.network.subNetDistances.idxs;
+    this.state = {
+      svg: null,
+      points: ScatterPlot.getScatterData(distances, networks, networkIdxs),
+    }
   }
 
   componentDidMount () {
-    ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
+    const containerId = Util.getParentIdOfReactComp(this);
+    this.setState({
+      svg: Util.generateSVG(containerId),
+    });
   }
 
   componentDidUpdate () {
-    ScatterPlot.drawScatterPlot(this.svg, this.points, this.networkIdxs);
+    ScatterPlot.drawScatterPlot(this.state.svg, this.state.points);
   }
 
-  static drawScatterPlot (svg, normPoints, networkIdxs) {
+  static drawScatterPlot (svg, normPoints) {
     // get svg box 
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
@@ -97,11 +100,11 @@ class ScatterPlot extends React.Component {
       a: 0.75
     }));
 
-    return new Points(pointArr);
+    return new Points(pointArr).normalize();
   }
 
   render () {
-    return <div id={"#" + this.props.id}></div>
+    return <div />
   }
 }
 
@@ -148,6 +151,8 @@ class Points {
     this.maxX = 1;
     this.maxY = 1;
     this.maxR = 1;
+
+    return this;
   }
 
 }

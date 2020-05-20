@@ -1,17 +1,22 @@
 class PCoold extends React.Component {
   constructor(props) {
     super(props);
-    this.svg = Util.generateSVG(`#${this.props.containerId}`);
-    this.networks = this.props.network.subNetworks;
-    this.statsMinMax = PCoold.minMaxStats(this.networks);
+    this.state = {
+      svg: null,
+      networks: this.props.network.subNetworks,
+      statsMinMax: PCoold.minMaxStats(this.props.network.subNetworks),
+    }
   }
 
   componentDidMount () {
-    PCoold.drawPCoold(this.svg, this.networks, this.statsMinMax);
+    const containerId = Util.getParentIdOfReactComp(this);
+    this.setState({
+      svg: Util.generateSVG(containerId),
+    });
   }
 
   componentDidUpdate () {
-    PCoold.drawPCoold(this.svg, this.networks, this.statsMinMax);
+    PCoold.drawPCoold(this.state.svg, this.state.networks, this.state.statsMinMax);
   }
 
   static drawPCoold (svg, networks, statsMinMax) {
