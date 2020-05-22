@@ -11,6 +11,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var PCoold = function (_React$Component) {
   _inherits(PCoold, _React$Component);
 
+  // TODO: 마우스 호버 이벤트 (툴팁)
+  // TODO: 마우스 클릭 이벤트 (노드링크 다이어그램)
+  // TODO: Interaction - P-coord 영역 선택 -> scatter 와 연동
   function PCoold(props) {
     _classCallCheck(this, PCoold);
 
@@ -45,6 +48,7 @@ var PCoold = function (_React$Component) {
   }], [{
     key: 'drawPCoold',
     value: function drawPCoold(svg, networks, statsMinMax) {
+      svg.selectAll("*").remove();
       // data size 
       var networkLen = networks.length;
       var statsKeys = Object.keys(statsMinMax);

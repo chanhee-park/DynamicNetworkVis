@@ -1,5 +1,7 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -12,103 +14,93 @@ var App = function (_React$Component) {
   function App(props) {
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+    _this.state = {
+      selectedNodes: []
+    };
+    _this.addSelectedNode = _this.addSelectedNode.bind(_this);
+    return _this;
   }
 
   _createClass(App, [{
-    key: "render",
-    value: function render() {
-      return React.createElement(
-        "div",
-        { "class": "app" },
-        React.createElement(
-          "div",
-          { "class": "container-group top" },
-          React.createElement(
-            "div",
-            { "class": "container",
-              id: "timeline-container" },
-            React.createElement(Timeline, { network: this.props.network })
-          ),
-          React.createElement(
-            "div",
-            { id: "tooltip",
-              "class": "hidden" },
-            React.createElement(
-              "p",
-              null,
-              React.createElement(
-                "strong",
-                null,
-                "Network is changed"
-              )
-            ),
-            React.createElement(
-              "p",
-              null,
-              React.createElement(
-                "span",
-                { id: "value" },
-                "-"
-              )
-            )
-          )
-        ),
-        React.createElement(
-          "div",
-          { "class": "container-group body" },
-          React.createElement(
-            "div",
-            { "class": "container",
-              id: "scatter-container" },
-            React.createElement(ScatterPlot, { network: this.props.network })
-          ),
-          React.createElement(
-            "div",
-            { "class": "container",
-              id: "parallel-container" },
-            React.createElement(PCoold, { network: this.props.network })
-          )
-        ),
-        React.createElement(
-          "div",
-          { "class": "container-group bottom" },
-          React.createElement(
-            "div",
-            { "class": "container-wrapper",
-              id: "smalls-container-wrapper" },
-            React.createElement(
-              "div",
-              { "class": "container",
-                id: "smalls-container" },
-              React.createElement(Smalls, { network: this.props.network })
-            )
-          ),
-          React.createElement("div", { "class": "container",
-            id: "table-container" })
-        )
-      );
+    key: 'addSelectedNode',
+    value: function addSelectedNode(selectedNode) {
+      var addedList = [].concat(_toConsumableArray(this.state.selectedNodes), [selectedNode]);
+      this.setState({
+        selectedNodes: addedList
+      });
     }
   }, {
-    key: "print",
+    key: 'print',
     value: function print() {
       console.log('-- APP --');
       console.log('data:', this.data);
       console.log('netw:', this.network);
       console.log('visu:', this.visualizations);
     }
-
-    // start () {
-    //   this.updateVis();
-    // }
-
-    // updateVis () {
-    //   Object.entries(this.visualizations).forEach(([key, vis]) => {
-    //     const container = document.querySelector(`#${key}-container`);
-    //     ReactDOM.render(vis, container);
-    //   });
-    // }
-
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        { className: 'app' },
+        React.createElement(
+          'div',
+          { className: 'container-group top' },
+          React.createElement(
+            'div',
+            { className: 'container',
+              id: 'timeline-container' },
+            React.createElement(Timeline, { network: this.props.network })
+          )
+        ),
+        React.createElement(Tooltip, { text: 'Network is Changed' }),
+        React.createElement(
+          'div',
+          { className: 'container-group body' },
+          React.createElement(
+            'div',
+            { className: 'container',
+              id: 'scatter-container' },
+            React.createElement(ScatterPlot, { network: this.props.network })
+          ),
+          React.createElement(
+            'div',
+            { className: 'container',
+              id: 'parallel-container' },
+            React.createElement(PCoold, { network: this.props.network })
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'container-group bottom' },
+          React.createElement(
+            'div',
+            { className: 'container-wrapper',
+              id: 'smalls-container-wrapper' },
+            React.createElement(
+              'div',
+              { className: 'container',
+                id: 'smalls-container' },
+              React.createElement(Smalls, { network: this.props.network,
+                nodeClickHandler: this.addSelectedNode })
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'container-wrapper',
+              id: 'table-container-wrapper' },
+            React.createElement(
+              'div',
+              { className: 'container',
+                id: 'table-container' },
+              React.createElement(NodeTable, { nodes: this.state.selectedNodes })
+            )
+          )
+        )
+      );
+    }
   }]);
 
   return App;

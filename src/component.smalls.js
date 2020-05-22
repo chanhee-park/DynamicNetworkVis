@@ -15,24 +15,26 @@ class Smalls extends React.Component {
   }
 
   componentDidUpdate () {
-    Smalls.drawSmalls(this.state.container, this.state.networks);
+    Smalls.drawSmalls(
+      this.state.container,
+      this.state.networks,
+      this.props.nodeClickHandler
+    );
   }
 
-  static drawSmalls (container, networks) {
+  static drawSmalls (container, networks, nodeClickEvent) {
     let cnt = 0;
     networks.forEach((network, i) => {
       if (network.nodes.size > 0) {
-        // set svg
         const padNum = (('000' + i).slice(-3)); // pad with 0 (eg. 003, 072)
         const diagramId = `diagram${padNum}`;
         const diagramDiv = document.createElement('div');
         diagramDiv.setAttribute("class", "diagram");
         diagramDiv.setAttribute("id", diagramId);
         container.appendChild(diagramDiv);
-        if (cnt < 2) {
+        if (cnt < 5) {
           cnt++;
-          console.log(cnt, i, network);
-          NodeLinkDiagram.draw(diagramId, network);
+          NodeLinkDiagram.draw(diagramId, network, i, nodeClickEvent);
         }
       }
     });
@@ -44,27 +46,45 @@ class Smalls extends React.Component {
 }
 
 class NodeLinkDiagram {
-  static draw (containerId, network) {
-    var container = document.getElementById(containerId);
-    var data = {
-      nodes: NodeLinkDiagram.getVisNodes(network),
-      edges: NodeLinkDiagram.getVisEdges(network)
-    };
-    var options = {};
+  static draw (containerId, network, networkIdx, nodeClickEvent) {
+    const container = document.getElementById(containerId);
+    const nodes = NodeLinkDiagram.getVisNodes(network.nodes);
+    const edges = NodeLinkDiagram.getVisEdges(network.links);
+    const data = { nodes, edges };
+    const options = {};
 
-    var network = new vis.Network(container, data, options);
+    const visNetwork = new vis.Network(container, data, options);
+    // TODO: 노드 위치 받아서/계산해서 직접 그리기
+    // visNetwork.on("afterDrawing", function (properties) {
+    //   console.log(nodes);
+    // });
+    visNetwork.on('click', properties => {
+      if (properties.nodes.length > 0) {
+        const nodeIdx = properties.nodes[0];
+        // TODO: 실제 노트 통계치 계산해서 만들기 
+        nodeClickEvent({
+          'Node ID': nodeIdx,
+          'Network Time Section': networkIdx,
+          'Degree': parseInt(Math.random() * 100),
+          'random(1)': parseInt(Math.random() * 48 + 8),
+          'random(2)': parseInt(Math.random() * 39 + 27),
+          'random(3)': parseInt(Math.random() * 50),
+          'random(4)': parseInt(Math.random() * 123),
+        });
+      }
+    });
+
   }
 
-  static getVisNodes (network) {
-    const nodes = [...network.nodes].map(node => (
+  static getVisNodes (nodes) {
+    return new vis.DataSet([...nodes].map(node => (
       { id: node, label: node }
-    ));
-    return new vis.DataSet(nodes);
+    )));
   }
 
-  static getVisEdges (network) {
+  static getVisEdges (links) {
     const edgeMap = {};
-    for (let link of network.links) {
+    for (let link of links) {
       const from = Math.min(link.from, link.to);
       const to = Math.max(link.from, link.to);
       const key = `${from}-${to}`;

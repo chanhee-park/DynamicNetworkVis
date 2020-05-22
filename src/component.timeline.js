@@ -1,4 +1,8 @@
 class Timeline extends React.Component {
+  // TODO: 클릭 이벤트 (노드링크 다이어그램)
+  // TODO: Time Slider 코드 리펙토링 / 함수 분리 / 모듈화
+  // TODO: Interaction - 시간 합치고 분리하기
+
   constructor(props) {
     super(props);
     this.state = {
@@ -20,6 +24,7 @@ class Timeline extends React.Component {
   }
 
   createTimeline (svg, timelineInfo) {
+    svg.selectAll("*").remove();
     // get time compared data
     const bars = timelineInfo.bars;
     const max = timelineInfo.maxSize;

@@ -1,47 +1,17 @@
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      selectedNodes: []
+    }
+    this.addSelectedNode = this.addSelectedNode.bind(this);
   }
 
-  render () {
-    return (
-      <div class="app">
-        <div class="container-group top">
-          <div class="container"
-            id='timeline-container'>
-            <Timeline network={this.props.network} />
-          </div>
-          <div id="tooltip"
-            class="hidden">
-            <p><strong>Network is changed</strong></p>
-            <p><span id="value">-</span></p>
-          </div>
-        </div>
-
-        <div class="container-group body">
-          <div class="container"
-            id='scatter-container'>
-            < ScatterPlot network={this.props.network} />
-          </div>
-          <div class="container"
-            id='parallel-container'>
-            <PCoold network={this.props.network} />
-          </div>
-        </div>
-
-        <div class="container-group bottom">
-          <div class="container-wrapper"
-            id='smalls-container-wrapper'>
-            <div class="container"
-              id='smalls-container'>
-              <Smalls network={this.props.network} />
-            </div>
-          </div>
-          <div class="container"
-            id='table-container'></div>
-        </div>
-      </div>
-    );
+  addSelectedNode (selectedNode) {
+    const addedList = [...this.state.selectedNodes, selectedNode];
+    this.setState({
+      selectedNodes: addedList
+    });
   }
 
   print () {
@@ -51,16 +21,49 @@ class App extends React.Component {
     console.log('visu:', this.visualizations);
   }
 
-  // start () {
-  //   this.updateVis();
-  // }
+  render () {
+    return (
+      <div className="app">
+        <div className="container-group top">
+          <div className="container"
+            id='timeline-container'>
+            <Timeline network={this.props.network} />
+          </div>
+        </div>
+        <Tooltip text="Network is Changed"></Tooltip>
 
-  // updateVis () {
-  //   Object.entries(this.visualizations).forEach(([key, vis]) => {
-  //     const container = document.querySelector(`#${key}-container`);
-  //     ReactDOM.render(vis, container);
-  //   });
-  // }
+        <div className="container-group body">
+          <div className="container"
+            id='scatter-container'>
+            < ScatterPlot network={this.props.network} />
+          </div>
+          <div className="container"
+            id='parallel-container'>
+            <PCoold network={this.props.network} />
+          </div>
+        </div>
+
+        <div className="container-group bottom">
+          <div className="container-wrapper"
+            id='smalls-container-wrapper'>
+            <div className="container"
+              id='smalls-container'>
+              <Smalls network={this.props.network}
+                nodeClickHandler={this.addSelectedNode} />
+            </div>
+          </div>
+
+          <div className="container-wrapper"
+            id='table-container-wrapper'>
+            <div className="container"
+              id='table-container'>
+              <NodeTable nodes={this.state.selectedNodes} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 const ts = testsets[3];

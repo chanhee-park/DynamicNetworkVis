@@ -34,7 +34,7 @@ var Smalls = function (_React$Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      Smalls.drawSmalls(this.state.container, this.state.networks);
+      Smalls.drawSmalls(this.state.container, this.state.networks, this.props.nodeClickHandler);
     }
   }, {
     key: 'render',
@@ -43,21 +43,19 @@ var Smalls = function (_React$Component) {
     }
   }], [{
     key: 'drawSmalls',
-    value: function drawSmalls(container, networks) {
+    value: function drawSmalls(container, networks, nodeClickEvent) {
       var cnt = 0;
       networks.forEach(function (network, i) {
         if (network.nodes.size > 0) {
-          // set svg
           var padNum = ('000' + i).slice(-3); // pad with 0 (eg. 003, 072)
           var diagramId = 'diagram' + padNum;
           var diagramDiv = document.createElement('div');
           diagramDiv.setAttribute("class", "diagram");
           diagramDiv.setAttribute("id", diagramId);
           container.appendChild(diagramDiv);
-          if (cnt < 2) {
+          if (cnt < 5) {
             cnt++;
-            console.log(cnt, i, network);
-            NodeLinkDiagram.draw(diagramId, network);
+            NodeLinkDiagram.draw(diagramId, network, i, nodeClickEvent);
           }
         }
       });
@@ -74,34 +72,51 @@ var NodeLinkDiagram = function () {
 
   _createClass(NodeLinkDiagram, null, [{
     key: 'draw',
-    value: function draw(containerId, network) {
+    value: function draw(containerId, network, networkIdx, nodeClickEvent) {
       var container = document.getElementById(containerId);
-      var data = {
-        nodes: NodeLinkDiagram.getVisNodes(network),
-        edges: NodeLinkDiagram.getVisEdges(network)
-      };
+      var nodes = NodeLinkDiagram.getVisNodes(network.nodes);
+      var edges = NodeLinkDiagram.getVisEdges(network.links);
+      var data = { nodes: nodes, edges: edges };
       var options = {};
 
-      var network = new vis.Network(container, data, options);
+      var visNetwork = new vis.Network(container, data, options);
+      // TODO: 노드 위치 받아서/계산해서 직접 그리기
+      // visNetwork.on("afterDrawing", function (properties) {
+      //   console.log(nodes);
+      // });
+      visNetwork.on('click', function (properties) {
+        if (properties.nodes.length > 0) {
+          var nodeIdx = properties.nodes[0];
+          // TODO: 실제 노트 통계치 계산해서 만들기 
+          nodeClickEvent({
+            'Node ID': nodeIdx,
+            'Network Time Section': networkIdx,
+            'Degree': parseInt(Math.random() * 100),
+            'random(1)': parseInt(Math.random() * 48 + 8),
+            'random(2)': parseInt(Math.random() * 39 + 27),
+            'random(3)': parseInt(Math.random() * 50),
+            'random(4)': parseInt(Math.random() * 123)
+          });
+        }
+      });
     }
   }, {
     key: 'getVisNodes',
-    value: function getVisNodes(network) {
-      var nodes = [].concat(_toConsumableArray(network.nodes)).map(function (node) {
+    value: function getVisNodes(nodes) {
+      return new vis.DataSet([].concat(_toConsumableArray(nodes)).map(function (node) {
         return { id: node, label: node };
-      });
-      return new vis.DataSet(nodes);
+      }));
     }
   }, {
     key: 'getVisEdges',
-    value: function getVisEdges(network) {
+    value: function getVisEdges(links) {
       var edgeMap = {};
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = network.links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var link = _step.value;
 
           var from = Math.min(link.from, link.to);

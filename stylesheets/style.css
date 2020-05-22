@@ -50,17 +50,17 @@ body {
 }
 
 .container-group.top {
-  flex: 1.25;
+  flex: 1.2;
 }
 
 .container-group.body {
-  flex: 4;
+  flex: 3;
   display: flex;
   flex-direction: row;
 }
 
 .container-group.bottom {
-  flex: 4.75;
+  flex: 5.8;
   display: flex;
   flex-direction: column;
 }
@@ -81,11 +81,11 @@ body {
 
 /* .container => .container-group.body */
 .container#parallel-container {
-  flex: 7.5;
+  flex: 8;
 }
 
 .container#scatter-container {
-  flex: 2.5;
+  flex: 2;
 }
 
 /* .container => .container-group.bottom */
@@ -104,42 +104,20 @@ body {
   padding: 5px;
 }
 
-.container#table-container {
+.container-wrapper#table-container-wrapper {
   flex: 4;
+}
+
+.container#table-container {
+  max-height: 275px;
+  overflow-y: scroll;
 }
 
 /* Node Link Diagram */
 .container#smalls-container>.diagram {
   display: inline-block;
-  width: 320px;
+  width: 420px;
   height: 100%;
   margin: auto 2px;
   border: 1px solid #ccc;
-}
-
-
-/* tooltip */
-#tooltip {
-  position: absolute;
-  width: 500px;
-  height: auto;
-  padding: 10px;
-  background-color: white;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
-  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  pointer-events: none;
-}
-
-#tooltip.hidden {
-  display: none;
-}
-
-#tooltip p {
-  margin: 0;
-  font-size: 16px;
-  line-height: 28px;
 }

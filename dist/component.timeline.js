@@ -9,6 +9,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Timeline = function (_React$Component) {
   _inherits(Timeline, _React$Component);
 
+  // TODO: 클릭 이벤트 (노드링크 다이어그램)
+  // TODO: Time Slider 코드 리펙토링 / 함수 분리 / 모듈화
+  // TODO: Interaction - 시간 합치고 분리하기
+
   function Timeline(props) {
     _classCallCheck(this, Timeline);
 
@@ -37,6 +41,7 @@ var Timeline = function (_React$Component) {
   }, {
     key: 'createTimeline',
     value: function createTimeline(svg, timelineInfo) {
+      svg.selectAll("*").remove();
       // get time compared data
       var bars = timelineInfo.bars;
       var max = timelineInfo.maxSize;

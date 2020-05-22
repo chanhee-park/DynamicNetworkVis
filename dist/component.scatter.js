@@ -11,6 +11,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ScatterPlot = function (_React$Component) {
   _inherits(ScatterPlot, _React$Component);
 
+  // TODO: 마우스 호버 이벤트 (툴팁)
+  // TODO: 마우스 클릭 이벤트 (노드링크 다이어그램)
   function ScatterPlot(props) {
     _classCallCheck(this, ScatterPlot);
 
@@ -47,6 +49,7 @@ var ScatterPlot = function (_React$Component) {
   }], [{
     key: 'drawScatterPlot',
     value: function drawScatterPlot(svg, normPoints) {
+      svg.selectAll("*").remove();
       // get svg box 
       var svgBBox = svg.node().getBoundingClientRect();
       var svgW = svgBBox.width;

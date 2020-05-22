@@ -1,4 +1,7 @@
 class PCoold extends React.Component {
+  // TODO: 마우스 호버 이벤트 (툴팁)
+  // TODO: 마우스 클릭 이벤트 (노드링크 다이어그램)
+  // TODO: Interaction - P-coord 영역 선택 -> scatter 와 연동
   constructor(props) {
     super(props);
     this.state = {
@@ -20,6 +23,7 @@ class PCoold extends React.Component {
   }
 
   static drawPCoold (svg, networks, statsMinMax) {
+    svg.selectAll("*").remove();
     // data size 
     const networkLen = networks.length;
     const statsKeys = Object.keys(statsMinMax);

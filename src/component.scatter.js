@@ -1,4 +1,6 @@
 class ScatterPlot extends React.Component {
+  // TODO: 마우스 호버 이벤트 (툴팁)
+  // TODO: 마우스 클릭 이벤트 (노드링크 다이어그램)
   constructor(props) {
     super(props);
     const distances = this.props.network.subNetDistances.matrix;
@@ -22,6 +24,7 @@ class ScatterPlot extends React.Component {
   }
 
   static drawScatterPlot (svg, normPoints) {
+    svg.selectAll("*").remove();
     // get svg box 
     const svgBBox = svg.node().getBoundingClientRect();
     const svgW = svgBBox.width;
