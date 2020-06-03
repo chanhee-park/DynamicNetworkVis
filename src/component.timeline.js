@@ -1,4 +1,6 @@
 class Timeline extends React.Component {
+  // TODO: Sankey 로 바꾼다.
+  // https://observablehq.com/@d3/sankey-diagram
   // TODO: 클릭 이벤트 (노드링크 다이어그램)
   // TODO: Time Slider 코드 리펙토링 / 함수 분리 / 모듈화
   // TODO: Interaction - 시간 합치고 분리하기

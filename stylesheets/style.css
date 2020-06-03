@@ -1,3 +1,4 @@
+/* TODO: top, body, bottom -> col-N (N = {1,2,3,4}) */
 :root {
   --section-title-box-height: 20px;
   --padding-for-section: 3px;
@@ -96,12 +97,12 @@ body {
 }
 
 .container#smalls-container {
-  max-height: 100%;
+  height: 100%;
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
   margin: 0 auto;
-  padding: 5px;
+  padding: 2px;
 }
 
 .container-wrapper#table-container-wrapper {
@@ -117,7 +118,7 @@ body {
 .container#smalls-container>.diagram {
   display: inline-block;
   width: 420px;
-  height: 100%;
+  height: 98%;
   margin: auto 2px;
   border: 1px solid #ccc;
 }

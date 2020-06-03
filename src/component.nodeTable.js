@@ -1,4 +1,5 @@
 class NodeTable extends React.Component {
+  // TODO: Talbe -> LineUp
   constructor(props) {
     super(props);
   }

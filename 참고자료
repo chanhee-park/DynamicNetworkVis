@@ -15,3 +15,8 @@ https://www.npmjs.com/package/pca-js
 네트워크 시각화
 https://js.cytoscape.org/ 
 https://visjs.org/ 
+
+사용할 네트워크 통계치
+- ManyNets: Vertex count(Nodes), Edge count(Links), Edge-vertex ratio, Component count, Component size, Duplicate edge count, Degree histogram, Duration histogram, and so on...
+- Network Repository: Vertex Count, Edge Count, Degree(max, avg), Triangles (count, max, avg), Assort coefficient, Clustering coefficient (local avg, global), Maximum k-core number, Lower bound on the size of the maximum clique
+- And... : histograms of k-clique and k-cores

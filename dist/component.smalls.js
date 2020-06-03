@@ -11,6 +11,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Smalls = function (_React$Component) {
   _inherits(Smalls, _React$Component);
 
+  // TODO: t-sne로 네트워크 그리기 (빠름)
+  // TODO: 네트워크간 연결선 그리기 
+  // TODO: 선택된 노드에만 네트워크간 연결선이 나타나게 하기
   function Smalls(props) {
     _classCallCheck(this, Smalls);
 

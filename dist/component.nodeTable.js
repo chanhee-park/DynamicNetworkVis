@@ -9,6 +9,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var NodeTable = function (_React$Component) {
   _inherits(NodeTable, _React$Component);
 
+  // TODO: Talbe -> LineUp
   function NodeTable(props) {
     _classCallCheck(this, NodeTable);
 
